@@ -1,0 +1,79 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-b23047ad630ad1baaf05.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "kpsrc",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "kpsrc::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-kpsrc-Debug-5adb7038cef27046776e.json",
+					"name" : "kpsrc",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "kpsrc_autogen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-kpsrc_autogen-Debug-b95562e646b3835cdf1c.json",
+					"name" : "kpsrc_autogen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "kpsrc_autogen_timestamp_deps::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-kpsrc_autogen_timestamp_deps-Debug-a747f627a07704b331c7.json",
+					"name" : "kpsrc_autogen_timestamp_deps",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/admin/Desktop/prog/networks/kpsrc/build/Desktop_Qt_6_9_3_MinGW_64_bit-Debug",
+		"source" : "C:/Users/admin/Desktop/prog/networks/kpsrc"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 7
+	}
+}
