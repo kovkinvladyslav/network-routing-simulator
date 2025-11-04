@@ -347,6 +347,12 @@
 	"HEADERS" : 
 	[
 		[
+			"C:/Users/admin/Desktop/prog/networks/kpsrc/createchanneldialog.h",
+			"MU",
+			"EWIEGA46WW/moc_createchanneldialog.cpp",
+			null
+		],
+		[
 			"C:/Users/admin/Desktop/prog/networks/kpsrc/graph.h",
 			"MU",
 			"EWIEGA46WW/moc_graph.cpp",
@@ -436,6 +442,11 @@
 	"SETTINGS_FILE" : "C:/Users/admin/Desktop/prog/networks/kpsrc/build/Desktop_Qt_6_9_3_MinGW_64_bit-Debug/CMakeFiles/kpsrc_autogen.dir/AutogenUsed.txt",
 	"SOURCES" : 
 	[
+		[
+			"C:/Users/admin/Desktop/prog/networks/kpsrc/createchanneldialog.cpp",
+			"MU",
+			null
+		],
 		[ "C:/Users/admin/Desktop/prog/networks/kpsrc/graph.cpp", "MU", null ],
 		[ "C:/Users/admin/Desktop/prog/networks/kpsrc/main.cpp", "MU", null ],
 		[

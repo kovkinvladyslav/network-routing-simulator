@@ -1,6 +1,7 @@
 #include "node.h"
 #include <QBrush>
 #include <QPoint>
+#include <QPen>
 
 Node::Node(int id, QPointF pos)
     : QGraphicsEllipseItem(-20, -20, 20, 20), id(id)
@@ -46,6 +47,15 @@ void Node::setState(NodeState newState)
     case NodeState::DISCONNECTED:
         setBrush(Qt::gray);
         break;
+    }
+}
+
+void Node::hightlight(bool on)
+{
+    if(on){
+        setPen(QPen(Qt::yellow, 3));
+    } else {
+        setPen(Qt::NoPen);
     }
 }
 

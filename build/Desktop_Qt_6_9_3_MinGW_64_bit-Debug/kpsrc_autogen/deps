@@ -153,9 +153,11 @@ kpsrc_autogen/timestamp: \
 	C:/Qt/6.9.3/mingw_64/include/QtGui/qtransform.h \
 	C:/Qt/6.9.3/mingw_64/include/QtGui/qwindowdefs.h \
 	C:/Qt/6.9.3/mingw_64/include/QtGui/qwindowdefs_win.h \
+	C:/Qt/6.9.3/mingw_64/include/QtWidgets/QDialog \
 	C:/Qt/6.9.3/mingw_64/include/QtWidgets/QGraphicsEllipseItem \
 	C:/Qt/6.9.3/mingw_64/include/QtWidgets/QGraphicsScene \
 	C:/Qt/6.9.3/mingw_64/include/QtWidgets/QMainWindow \
+	C:/Qt/6.9.3/mingw_64/include/QtWidgets/qdialog.h \
 	C:/Qt/6.9.3/mingw_64/include/QtWidgets/qgraphicsitem.h \
 	C:/Qt/6.9.3/mingw_64/include/QtWidgets/qgraphicsscene.h \
 	C:/Qt/6.9.3/mingw_64/include/QtWidgets/qmainwindow.h \
@@ -590,6 +592,8 @@ kpsrc_autogen/timestamp: \
 	C:/Users/admin/Desktop/prog/networks/kpsrc/build/Desktop_Qt_6_9_3_MinGW_64_bit-Debug/CMakeFiles/3.30.5/CMakeRCCompiler.cmake \
 	C:/Users/admin/Desktop/prog/networks/kpsrc/build/Desktop_Qt_6_9_3_MinGW_64_bit-Debug/CMakeFiles/3.30.5/CMakeSystem.cmake \
 	C:/Users/admin/Desktop/prog/networks/kpsrc/build/Desktop_Qt_6_9_3_MinGW_64_bit-Debug/kpsrc_autogen/moc_predefs.h \
+	C:/Users/admin/Desktop/prog/networks/kpsrc/createchanneldialog.cpp \
+	C:/Users/admin/Desktop/prog/networks/kpsrc/createchanneldialog.h \
 	C:/Users/admin/Desktop/prog/networks/kpsrc/graph.cpp \
 	C:/Users/admin/Desktop/prog/networks/kpsrc/graph.h \
 	C:/Users/admin/Desktop/prog/networks/kpsrc/main.cpp \
@@ -597,5 +601,6 @@ kpsrc_autogen/timestamp: \
 	C:/Users/admin/Desktop/prog/networks/kpsrc/mainwindow.h \
 	C:/Users/admin/Desktop/prog/networks/kpsrc/node.cpp \
 	C:/Users/admin/Desktop/prog/networks/kpsrc/node.h \
+	C:/Users/admin/Desktop/prog/networks/kpsrc/createchanneldialog.ui \
 	C:/Users/admin/Desktop/prog/networks/kpsrc/mainwindow.ui \
 	C:/Qt/Tools/CMake_64/bin/cmake.exe

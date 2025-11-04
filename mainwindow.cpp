@@ -1,6 +1,8 @@
 #include "mainwindow.h"
-#include "./ui_mainwindow.h"
+#include "ui_mainwindow.h"
 #include "graph.h"
+#include "createchanneldialog.h"
+#include <QDialog>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -18,7 +20,19 @@ MainWindow::~MainWindow()
 }
 
 
-void MainWindow::on_actionAdd_triggered()
+void MainWindow::on_actionZoom_In_triggered()
+{
+    constexpr double factor = 1.2;
+    ui->graphicsView->scale(factor, factor);
+}
+
+void MainWindow::on_actionZoom_Out_triggered()
+{
+    constexpr double factor = 1/1.2;
+    ui->graphicsView->scale(factor, factor);
+}
+
+void MainWindow::on_actionAddNode_triggered()
 {
     QPointF scenePos = ui->graphicsView->mapToScene(ui->graphicsView->viewport()->rect().center());
     static int nextId = 1;
@@ -26,16 +40,13 @@ void MainWindow::on_actionAdd_triggered()
 }
 
 
-void MainWindow::on_actionZoom_In_triggered()
+void MainWindow::on_actionAddConnection_triggered()
 {
-    constexpr double factor = 1.2;
-    ui->graphicsView->scale(factor, factor);
-}
+    CreateChannelDialog dlg(this);
 
-
-void MainWindow::on_actionZoom_Out_triggered()
-{
-    constexpr double factor = 1/1.2;
-    ui->graphicsView->scale(factor, factor);
+    if(dlg.exec() == QDialog::Accepted) {
+        bool duplex = dlg.isDuplex();
+        bool randomWeight = dlg.isRandomWeight();
+    }
 }
 

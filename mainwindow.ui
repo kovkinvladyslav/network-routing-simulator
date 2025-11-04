@@ -50,7 +50,14 @@
     <property name="title">
      <string>Node</string>
     </property>
-    <addaction name="actionAdd"/>
+    <widget class="QMenu" name="menuAdd">
+     <property name="title">
+      <string>Add</string>
+     </property>
+     <addaction name="actionAddNode"/>
+     <addaction name="actionAddConnection"/>
+    </widget>
+    <addaction name="menuAdd"/>
     <addaction name="actionDelete"/>
     <addaction name="actionClear"/>
     <addaction name="actionSave"/>
@@ -72,12 +79,9 @@
    </attribute>
    <addaction name="actionZoom_In"/>
    <addaction name="actionZoom_Out"/>
+   <addaction name="actionAddNode"/>
+   <addaction name="actionAddConnection"/>
   </widget>
-  <action name="actionAdd">
-   <property name="text">
-    <string>Add</string>
-   </property>
-  </action>
   <action name="actionDelete">
    <property name="text">
     <string>Delete</string>
@@ -112,6 +116,19 @@
    </property>
    <property name="text">
     <string>Zoom Out</string>
+   </property>
+  </action>
+  <action name="actionAddNode">
+   <property name="text">
+    <string>Add Node</string>
+   </property>
+   <property name="toolTip">
+    <string>Node</string>
+   </property>
+  </action>
+  <action name="actionAddConnection">
+   <property name="text">
+    <string>Add Connection</string>
    </property>
   </action>
  </widget>

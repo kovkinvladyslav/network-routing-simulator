@@ -7,7 +7,7 @@
 				{
 					"build" : ".",
 					"hasInstallRule" : true,
-					"jsonFile" : "directory-.-Debug-67fe4ea81a4596ca90fc.json",
+					"jsonFile" : "directory-.-Debug-c5d49eddd17b01802938.json",
 					"minimumCMakeVersion" : 
 					{
 						"string" : "3.16"
@@ -44,7 +44,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "kpsrc::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-kpsrc-Debug-eb69f7995cb857a905aa.json",
+					"jsonFile" : "target-kpsrc-Debug-679fc4e609c9cdda092f.json",
 					"name" : "kpsrc",
 					"projectIndex" : 0
 				},
