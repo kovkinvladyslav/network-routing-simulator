@@ -1,8 +1,9 @@
 #ifndef NODE_H
 #define NODE_H
 #include <QGraphicsEllipseItem>
-#include <unordered_set>
+#include <unordered_map>
 #include <QPointF>
+#include <QObject>
 
 enum class NodeState {
     ON,
@@ -10,17 +11,28 @@ enum class NodeState {
     DISCONNECTED
 };
 
-class Node : public QGraphicsEllipseItem
+class Node : public QObject, public QGraphicsEllipseItem
 {
+    Q_OBJECT
 public:
     Node(int id, QPointF pos);
-    const std::unordered_set<Node*>& get_adj() const;
-    void add_adj(Node *other);
+    const std::unordered_map<Node*, int>& get_adj() const;
+    int getId();
+    void add_adj(Node *other, int weight);
     void setState(NodeState newState);
+    void highlight(bool on);
+signals:
+    void clicked(Node* self);
+    void moved();
+
+protected:
+    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
+
 private:
     int id;
     NodeState state = NodeState::DISCONNECTED;
-    std::unordered_set<Node*> adj_nodes;
+    std::unordered_map<Node*, int> adj_nodes;
     QGraphicsTextItem* label;
 };
 

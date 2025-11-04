@@ -11,15 +11,13 @@ class Graph
 {
 public:
     Graph(QGraphicsScene* scene);
-    Node* add_node(int id, QPointF pos);
-    void node_clicked(Node *node);
-    void clear_selection();
+    Node* add_node(std::unique_ptr<Node> node);
+    std::vector<Node*> getAllNodes() const;
+    void connect(Node* nodeA, Node* nodeB, bool isDuplex, int weight);
 private:
     QGraphicsScene* scene;
     std::vector<std::unique_ptr<Node>> nodes;
     std::unordered_set<Node*> nodes_search;
-    Node* first_selected = nullptr;
-    Node* second_selected = nullptr;
 };
 
 #endif // GRAPH_H

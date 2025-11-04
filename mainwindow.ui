@@ -24,13 +24,13 @@
        <set>QPainter::RenderHint::Antialiasing|QPainter::RenderHint::TextAntialiasing</set>
       </property>
       <property name="dragMode">
-       <enum>QGraphicsView::DragMode::ScrollHandDrag</enum>
+       <enum>QGraphicsView::DragMode::RubberBandDrag</enum>
       </property>
       <property name="transformationAnchor">
-       <enum>QGraphicsView::ViewportAnchor::NoAnchor</enum>
+       <enum>QGraphicsView::ViewportAnchor::AnchorUnderMouse</enum>
       </property>
       <property name="resizeAnchor">
-       <enum>QGraphicsView::ViewportAnchor::NoAnchor</enum>
+       <enum>QGraphicsView::ViewportAnchor::AnchorViewCenter</enum>
       </property>
      </widget>
     </item>
@@ -125,10 +125,16 @@
    <property name="toolTip">
     <string>Node</string>
    </property>
+   <property name="shortcut">
+    <string>N</string>
+   </property>
   </action>
   <action name="actionAddConnection">
    <property name="text">
     <string>Add Connection</string>
+   </property>
+   <property name="shortcut">
+    <string>C</string>
    </property>
   </action>
  </widget>

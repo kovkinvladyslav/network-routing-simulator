@@ -97,6 +97,30 @@ build CMakeFiles/kpsrc.dir/createchanneldialog.cpp.obj: CXX_COMPILER__kpsrc_unsc
   OBJECT_DIR = CMakeFiles\kpsrc.dir
   OBJECT_FILE_DIR = CMakeFiles\kpsrc.dir
 
+build CMakeFiles/kpsrc.dir/nodeselector.cpp.obj: CXX_COMPILER__kpsrc_unscanned_Debug C$:/Users/admin/Desktop/prog/networks/kpsrc/nodeselector.cpp || cmake_object_order_depends_target_kpsrc
+  DEFINES = -DMINGW_HAS_SECURE_API=1 -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64
+  DEP_FILE = CMakeFiles\kpsrc.dir\nodeselector.cpp.obj.d
+  FLAGS = -DQT_QML_DEBUG -g -std=gnu++17 -fdiagnostics-color=always
+  INCLUDES = -IC:/Users/admin/Desktop/prog/networks/kpsrc/build/Desktop_Qt_6_9_3_MinGW_64_bit-Debug/kpsrc_autogen/include -isystem C:/Qt/6.9.3/mingw_64/include/QtCore -isystem C:/Qt/6.9.3/mingw_64/include -isystem C:/Qt/6.9.3/mingw_64/mkspecs/win32-g++ -isystem C:/Qt/6.9.3/mingw_64/include/QtWidgets -isystem C:/Qt/6.9.3/mingw_64/include/QtGui
+  OBJECT_DIR = CMakeFiles\kpsrc.dir
+  OBJECT_FILE_DIR = CMakeFiles\kpsrc.dir
+
+build CMakeFiles/kpsrc.dir/edgeitem.cpp.obj: CXX_COMPILER__kpsrc_unscanned_Debug C$:/Users/admin/Desktop/prog/networks/kpsrc/edgeitem.cpp || cmake_object_order_depends_target_kpsrc
+  DEFINES = -DMINGW_HAS_SECURE_API=1 -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64
+  DEP_FILE = CMakeFiles\kpsrc.dir\edgeitem.cpp.obj.d
+  FLAGS = -DQT_QML_DEBUG -g -std=gnu++17 -fdiagnostics-color=always
+  INCLUDES = -IC:/Users/admin/Desktop/prog/networks/kpsrc/build/Desktop_Qt_6_9_3_MinGW_64_bit-Debug/kpsrc_autogen/include -isystem C:/Qt/6.9.3/mingw_64/include/QtCore -isystem C:/Qt/6.9.3/mingw_64/include -isystem C:/Qt/6.9.3/mingw_64/mkspecs/win32-g++ -isystem C:/Qt/6.9.3/mingw_64/include/QtWidgets -isystem C:/Qt/6.9.3/mingw_64/include/QtGui
+  OBJECT_DIR = CMakeFiles\kpsrc.dir
+  OBJECT_FILE_DIR = CMakeFiles\kpsrc.dir
+
+build CMakeFiles/kpsrc.dir/edgecontroller.cpp.obj: CXX_COMPILER__kpsrc_unscanned_Debug C$:/Users/admin/Desktop/prog/networks/kpsrc/edgecontroller.cpp || cmake_object_order_depends_target_kpsrc
+  DEFINES = -DMINGW_HAS_SECURE_API=1 -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64
+  DEP_FILE = CMakeFiles\kpsrc.dir\edgecontroller.cpp.obj.d
+  FLAGS = -DQT_QML_DEBUG -g -std=gnu++17 -fdiagnostics-color=always
+  INCLUDES = -IC:/Users/admin/Desktop/prog/networks/kpsrc/build/Desktop_Qt_6_9_3_MinGW_64_bit-Debug/kpsrc_autogen/include -isystem C:/Qt/6.9.3/mingw_64/include/QtCore -isystem C:/Qt/6.9.3/mingw_64/include -isystem C:/Qt/6.9.3/mingw_64/mkspecs/win32-g++ -isystem C:/Qt/6.9.3/mingw_64/include/QtWidgets -isystem C:/Qt/6.9.3/mingw_64/include/QtGui
+  OBJECT_DIR = CMakeFiles\kpsrc.dir
+  OBJECT_FILE_DIR = CMakeFiles\kpsrc.dir
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target kpsrc
@@ -105,7 +129,7 @@ build CMakeFiles/kpsrc.dir/createchanneldialog.cpp.obj: CXX_COMPILER__kpsrc_unsc
 #############################################
 # Link the executable kpsrc.exe
 
-build kpsrc.exe: CXX_EXECUTABLE_LINKER__kpsrc_Debug CMakeFiles/kpsrc.dir/kpsrc_autogen/mocs_compilation.cpp.obj CMakeFiles/kpsrc.dir/main.cpp.obj CMakeFiles/kpsrc.dir/mainwindow.cpp.obj CMakeFiles/kpsrc.dir/node.cpp.obj CMakeFiles/kpsrc.dir/graph.cpp.obj CMakeFiles/kpsrc.dir/createchanneldialog.cpp.obj | C$:/Qt/6.9.3/mingw_64/lib/libQt6Widgets.a C$:/Qt/6.9.3/mingw_64/lib/libQt6Gui.a C$:/Qt/6.9.3/mingw_64/lib/libQt6Core.a C$:/Qt/6.9.3/mingw_64/lib/libQt6EntryPoint.a || kpsrc_autogen kpsrc_autogen_timestamp_deps
+build kpsrc.exe: CXX_EXECUTABLE_LINKER__kpsrc_Debug CMakeFiles/kpsrc.dir/kpsrc_autogen/mocs_compilation.cpp.obj CMakeFiles/kpsrc.dir/main.cpp.obj CMakeFiles/kpsrc.dir/mainwindow.cpp.obj CMakeFiles/kpsrc.dir/node.cpp.obj CMakeFiles/kpsrc.dir/graph.cpp.obj CMakeFiles/kpsrc.dir/createchanneldialog.cpp.obj CMakeFiles/kpsrc.dir/nodeselector.cpp.obj CMakeFiles/kpsrc.dir/edgeitem.cpp.obj CMakeFiles/kpsrc.dir/edgecontroller.cpp.obj | C$:/Qt/6.9.3/mingw_64/lib/libQt6Widgets.a C$:/Qt/6.9.3/mingw_64/lib/libQt6Gui.a C$:/Qt/6.9.3/mingw_64/lib/libQt6Core.a C$:/Qt/6.9.3/mingw_64/lib/libQt6EntryPoint.a || kpsrc_autogen kpsrc_autogen_timestamp_deps
   FLAGS = -DQT_QML_DEBUG -g
   LINK_FLAGS = -mwindows
   LINK_LIBRARIES = C:/Qt/6.9.3/mingw_64/lib/libQt6Widgets.a  C:/Qt/6.9.3/mingw_64/lib/libQt6Gui.a  C:/Qt/6.9.3/mingw_64/lib/libQt6Core.a  -lmpr  -luserenv  -lmingw32  C:/Qt/6.9.3/mingw_64/lib/libQt6EntryPoint.a  -lshell32  -ld3d11  -ldxgi  -ldxguid  -ld3d12  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32

@@ -8,7 +8,7 @@ Node::Node(int id, QPointF pos)
 {
     setState(NodeState::DISCONNECTED);
     setPos(pos);
-    setFlags(ItemIsMovable | ItemIsSelectable);
+    setFlags(ItemIsMovable | ItemIsSelectable | ItemSendsGeometryChanges);
 
     label = new QGraphicsTextItem(QString::number(id), this);
     label->setDefaultTextColor(Qt::white);
@@ -18,16 +18,21 @@ Node::Node(int id, QPointF pos)
                   bounds.center().y() - label->boundingRect().height()/2);
 }
 
-const std::unordered_set<Node*> &Node::get_adj() const
+const std::unordered_map<Node*, int> &Node::get_adj() const
 {
     return adj_nodes;
 }
 
-void Node::add_adj(Node *other)
+int Node::getId()
+{
+    return id;
+}
+
+void Node::add_adj(Node *other, int weight)
 {
     this->setState(NodeState::ON);
     other->setState(NodeState::ON);
-    adj_nodes.insert(other);
+    adj_nodes[other] = weight;
 }
 
 void Node::setState(NodeState newState)
@@ -50,12 +55,32 @@ void Node::setState(NodeState newState)
     }
 }
 
-void Node::hightlight(bool on)
+void Node::highlight(bool on)
 {
     if(on){
         setPen(QPen(Qt::yellow, 3));
     } else {
         setPen(Qt::NoPen);
     }
+}
+
+void Node::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    emit clicked(this);
+    QGraphicsEllipseItem::mousePressEvent(event);
+}
+
+QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
+{
+    if (change == QGraphicsItem::ItemPositionHasChanged) {
+        emit moved();
+    }
+
+    if (change == QGraphicsItem::ItemSelectedHasChanged) {
+        bool selected = value.toBool();
+        highlight(selected);
+    }
+
+    return QGraphicsEllipseItem::itemChange(change, value);
 }
 

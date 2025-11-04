@@ -353,6 +353,18 @@
 			null
 		],
 		[
+			"C:/Users/admin/Desktop/prog/networks/kpsrc/edgecontroller.h",
+			"MU",
+			"EWIEGA46WW/moc_edgecontroller.cpp",
+			null
+		],
+		[
+			"C:/Users/admin/Desktop/prog/networks/kpsrc/edgeitem.h",
+			"MU",
+			"EWIEGA46WW/moc_edgeitem.cpp",
+			null
+		],
+		[
 			"C:/Users/admin/Desktop/prog/networks/kpsrc/graph.h",
 			"MU",
 			"EWIEGA46WW/moc_graph.cpp",
@@ -368,6 +380,12 @@
 			"C:/Users/admin/Desktop/prog/networks/kpsrc/node.h",
 			"MU",
 			"EWIEGA46WW/moc_node.cpp",
+			null
+		],
+		[
+			"C:/Users/admin/Desktop/prog/networks/kpsrc/nodeselector.h",
+			"MU",
+			"EWIEGA46WW/moc_nodeselector.cpp",
 			null
 		]
 	],
@@ -447,6 +465,12 @@
 			"MU",
 			null
 		],
+		[
+			"C:/Users/admin/Desktop/prog/networks/kpsrc/edgecontroller.cpp",
+			"MU",
+			null
+		],
+		[ "C:/Users/admin/Desktop/prog/networks/kpsrc/edgeitem.cpp", "MU", null ],
 		[ "C:/Users/admin/Desktop/prog/networks/kpsrc/graph.cpp", "MU", null ],
 		[ "C:/Users/admin/Desktop/prog/networks/kpsrc/main.cpp", "MU", null ],
 		[
@@ -454,7 +478,12 @@
 			"MU",
 			null
 		],
-		[ "C:/Users/admin/Desktop/prog/networks/kpsrc/node.cpp", "MU", null ]
+		[ "C:/Users/admin/Desktop/prog/networks/kpsrc/node.cpp", "MU", null ],
+		[
+			"C:/Users/admin/Desktop/prog/networks/kpsrc/nodeselector.cpp",
+			"MU",
+			null
+		]
 	],
 	"UIC_OPTIONS" : [],
 	"UIC_SEARCH_PATHS" : [],

@@ -4,36 +4,26 @@ Graph::Graph(QGraphicsScene *scene)
     :scene(scene){
 }
 
-Node* Graph::add_node(int id, QPointF pos)
+Node* Graph::add_node(std::unique_ptr<Node> node)
 {
-    auto node = std::make_unique<Node>(id, pos);
     Node* node_ptr = node.get();
-    nodes.push_back(std::move(node));
     nodes_search.insert(node_ptr);
     scene->addItem(node_ptr);
+    nodes.push_back(std::move(node));
     return node_ptr;
 }
 
-void Graph::node_clicked(Node *node)
+std::vector<Node *> Graph::getAllNodes() const
 {
-    if(!first_selected) {
-        first_selected = node;
-        node->hightlight(true);
-    }
-    if(first_selected && !second_selected && node != first_selected) {
-        second_selected = node;
-        node->hightlight(true);
-    }
+    std::vector<Node*> result;
+    result.reserve(nodes.size());
+    for (auto &ptr : nodes)
+        result.push_back(ptr.get());
+    return result;
 }
 
-void Graph::clear_selection()
+void Graph::connect(Node *nodeA, Node *nodeB, bool isDuplex, int weight)
 {
-    if(first_selected) {
-        first_selected->hightlight(false);
-        first_selected = nullptr;
-    }
-    if(second_selected) {
-        second_selected->hightlight(false);
-        second_selected = nullptr;
-    }
+    nodeA->add_adj(nodeB, weight);
 }
+

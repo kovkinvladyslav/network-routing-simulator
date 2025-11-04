@@ -3,6 +3,8 @@
 
 #include "graph.h"
 #include <QMainWindow>
+#include "nodeselector.h"
+#include "edgecontroller.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -30,5 +32,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     Graph* graph;
+    NodeSelector *selector;
+    EdgeController *edgeController;
 };
 #endif // MAINWINDOW_H

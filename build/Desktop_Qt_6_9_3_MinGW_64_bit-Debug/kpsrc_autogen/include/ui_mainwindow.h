@@ -76,9 +76,9 @@ public:
         graphicsView->setObjectName("graphicsView");
         graphicsView->setMouseTracking(false);
         graphicsView->setRenderHints(QPainter::RenderHint::Antialiasing|QPainter::RenderHint::TextAntialiasing);
-        graphicsView->setDragMode(QGraphicsView::DragMode::ScrollHandDrag);
-        graphicsView->setTransformationAnchor(QGraphicsView::ViewportAnchor::NoAnchor);
-        graphicsView->setResizeAnchor(QGraphicsView::ViewportAnchor::NoAnchor);
+        graphicsView->setDragMode(QGraphicsView::DragMode::RubberBandDrag);
+        graphicsView->setTransformationAnchor(QGraphicsView::ViewportAnchor::AnchorUnderMouse);
+        graphicsView->setResizeAnchor(QGraphicsView::ViewportAnchor::AnchorViewCenter);
 
         verticalLayout->addWidget(graphicsView);
 
@@ -131,7 +131,13 @@ public:
 #if QT_CONFIG(tooltip)
         actionAddNode->setToolTip(QCoreApplication::translate("MainWindow", "Node", nullptr));
 #endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(shortcut)
+        actionAddNode->setShortcut(QCoreApplication::translate("MainWindow", "N", nullptr));
+#endif // QT_CONFIG(shortcut)
         actionAddConnection->setText(QCoreApplication::translate("MainWindow", "Add Connection", nullptr));
+#if QT_CONFIG(shortcut)
+        actionAddConnection->setShortcut(QCoreApplication::translate("MainWindow", "C", nullptr));
+#endif // QT_CONFIG(shortcut)
         menuNode->setTitle(QCoreApplication::translate("MainWindow", "Node", nullptr));
         menuAdd->setTitle(QCoreApplication::translate("MainWindow", "Add", nullptr));
         toolBar->setWindowTitle(QCoreApplication::translate("MainWindow", "toolBar", nullptr));

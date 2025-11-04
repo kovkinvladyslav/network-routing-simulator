@@ -38,10 +38,22 @@ template <> constexpr inline auto CreateChannelDialog::qt_create_metaobjectdata<
 {
     namespace QMC = QtMocConstants;
     QtMocHelpers::StringRefStorage qt_stringData {
-        "CreateChannelDialog"
+        "CreateChannelDialog",
+        "on_Weight_Random_toggled",
+        "",
+        "checked",
+        "on_Weight_Manually_toggled"
     };
 
     QtMocHelpers::UintData qt_methods {
+        // Slot 'on_Weight_Random_toggled'
+        QtMocHelpers::SlotData<void(bool)>(1, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { QMetaType::Bool, 3 },
+        }}),
+        // Slot 'on_Weight_Manually_toggled'
+        QtMocHelpers::SlotData<void(bool)>(4, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { QMetaType::Bool, 3 },
+        }}),
     };
     QtMocHelpers::UintData qt_properties {
     };
@@ -63,10 +75,13 @@ Q_CONSTINIT const QMetaObject CreateChannelDialog::staticMetaObject = { {
 void CreateChannelDialog::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     auto *_t = static_cast<CreateChannelDialog *>(_o);
-    (void)_t;
-    (void)_c;
-    (void)_id;
-    (void)_a;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        switch (_id) {
+        case 0: _t->on_Weight_Random_toggled((*reinterpret_cast< std::add_pointer_t<bool>>(_a[1]))); break;
+        case 1: _t->on_Weight_Manually_toggled((*reinterpret_cast< std::add_pointer_t<bool>>(_a[1]))); break;
+        default: ;
+        }
+    }
 }
 
 const QMetaObject *CreateChannelDialog::metaObject() const
@@ -85,6 +100,18 @@ void *CreateChannelDialog::qt_metacast(const char *_clname)
 int CreateChannelDialog::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
     _id = QDialog::qt_metacall(_c, _id, _a);
+    if (_id < 0)
+        return _id;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        if (_id < 2)
+            qt_static_metacall(this, _c, _id, _a);
+        _id -= 2;
+    }
+    if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
+        if (_id < 2)
+            *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
+        _id -= 2;
+    }
     return _id;
 }
 QT_WARNING_POP
