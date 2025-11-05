@@ -17,6 +17,7 @@ public:
     void connect(Node* nodeA, Node* nodeB, ChannelType type, ChannelMode mode, int weight);
     double computeTransmissionTime(const ChannelProperties& ch, int packetBytes);
     void removeConnection(Node* a, Node* b);
+    void removeNode(Node* node);
 
 
 private:

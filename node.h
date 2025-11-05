@@ -30,7 +30,7 @@ public:
     void setState(NodeState newState);
     void highlight(bool on);
     void removeAdj(Node* other);
-
+    const NodeState getState() const;
 signals:
     void clicked(Node* self);
     void moved();

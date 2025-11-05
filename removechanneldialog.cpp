@@ -18,6 +18,22 @@ RemoveChannelDialog::RemoveChannelDialog(QWidget *parent)
         if (getNodeB() && getNodeA() == getNodeB())
             ui->comboNodeA->setCurrentIndex(0);
     });
+
+
+    connect(ui->comboNodeA, &QComboBox::currentIndexChanged, this, [this]{
+
+        Node* a = getNodeA();
+        if (!a) return;
+
+        ui->comboNodeB->clear();
+        ui->comboNodeB->addItem("Select neighbor", QVariant::fromValue((void*)nullptr));
+
+        for (auto& [neighbor, props] : a->get_adj()) {
+            QString text = QString("Node %1").arg(neighbor->getId());
+            ui->comboNodeB->addItem(text, QVariant::fromValue((void*)neighbor));
+        }
+    });
+
 }
 
 

@@ -30,8 +30,12 @@ int Node::getId()
 
 void Node::add_adj(Node *other, int weight, ChannelType type, ChannelMode mode)
 {
-    setState(NodeState::ON);
-    other->setState(NodeState::ON);
+    if(state != NodeState::OFF) {
+        setState(NodeState::ON);
+    }
+    if(other->getState() != NodeState::OFF) {
+        other->setState(NodeState::ON);
+    }
     adj_nodes[other] = { weight, type, mode };
 }
 
@@ -65,13 +69,21 @@ void Node::highlight(bool on)
     }
 }
 
-void Node::removeAdj(Node *other)
+void Node::removeAdj(Node* other)
 {
     adj_nodes.erase(other);
 
     if (adj_nodes.empty()) {
         setState(NodeState::DISCONNECTED);
+        emit moved();
     }
+}
+
+
+
+const NodeState Node::getState() const
+{
+    return state;
 }
 
 void Node::mousePressEvent(QGraphicsSceneMouseEvent *event)

@@ -12,11 +12,17 @@
 #include <QtCore/QVariant>
 #include <QtGui/QAction>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QDockWidget>
 #include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
+#include <QtWidgets/QRadioButton>
 #include <QtWidgets/QStatusBar>
+#include <QtWidgets/QTableView>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
@@ -36,6 +42,7 @@ public:
     QAction *actionDelete_Node;
     QAction *actionDelete_Node_2;
     QAction *actionDelete_Connection;
+    QAction *actionShow_All;
     QWidget *centralwidget;
     QVBoxLayout *verticalLayout;
     QGraphicsView *graphicsView;
@@ -45,6 +52,15 @@ public:
     QMenu *menuAdd;
     QMenu *menuDelete;
     QToolBar *toolBar;
+    QDockWidget *dockWidget;
+    QWidget *nodeInspectorDock;
+    QVBoxLayout *verticalLayout_2;
+    QLabel *label;
+    QVBoxLayout *verticalLayout_3;
+    QHBoxLayout *horizontalLayout;
+    QRadioButton *NodeON;
+    QRadioButton *NodeOFF;
+    QTableView *tableView;
 
     void setupUi(QMainWindow *MainWindow)
     {
@@ -75,6 +91,8 @@ public:
         actionDelete_Node_2->setObjectName("actionDelete_Node_2");
         actionDelete_Connection = new QAction(MainWindow);
         actionDelete_Connection->setObjectName("actionDelete_Connection");
+        actionShow_All = new QAction(MainWindow);
+        actionShow_All->setObjectName("actionShow_All");
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName("centralwidget");
         verticalLayout = new QVBoxLayout(centralwidget);
@@ -106,6 +124,44 @@ public:
         toolBar = new QToolBar(MainWindow);
         toolBar->setObjectName("toolBar");
         MainWindow->addToolBar(Qt::ToolBarArea::TopToolBarArea, toolBar);
+        dockWidget = new QDockWidget(MainWindow);
+        dockWidget->setObjectName("dockWidget");
+        nodeInspectorDock = new QWidget();
+        nodeInspectorDock->setObjectName("nodeInspectorDock");
+        verticalLayout_2 = new QVBoxLayout(nodeInspectorDock);
+        verticalLayout_2->setObjectName("verticalLayout_2");
+        label = new QLabel(nodeInspectorDock);
+        label->setObjectName("label");
+
+        verticalLayout_2->addWidget(label);
+
+        verticalLayout_3 = new QVBoxLayout();
+        verticalLayout_3->setObjectName("verticalLayout_3");
+        horizontalLayout = new QHBoxLayout();
+        horizontalLayout->setObjectName("horizontalLayout");
+        NodeON = new QRadioButton(nodeInspectorDock);
+        NodeON->setObjectName("NodeON");
+
+        horizontalLayout->addWidget(NodeON);
+
+        NodeOFF = new QRadioButton(nodeInspectorDock);
+        NodeOFF->setObjectName("NodeOFF");
+
+        horizontalLayout->addWidget(NodeOFF);
+
+
+        verticalLayout_3->addLayout(horizontalLayout);
+
+
+        verticalLayout_2->addLayout(verticalLayout_3);
+
+        tableView = new QTableView(nodeInspectorDock);
+        tableView->setObjectName("tableView");
+
+        verticalLayout_2->addWidget(tableView);
+
+        dockWidget->setWidget(nodeInspectorDock);
+        MainWindow->addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, dockWidget);
 
         menubar->addAction(menuNode->menuAction());
         menuNode->addAction(menuAdd->menuAction());
@@ -115,6 +171,7 @@ public:
         menuNode->addAction(actionOpen);
         menuNode->addAction(actionZoom_In);
         menuNode->addAction(actionZoom_Out);
+        menuNode->addAction(actionShow_All);
         menuAdd->addAction(actionAddNode);
         menuAdd->addAction(actionAddConnection);
         menuDelete->addAction(actionDelete_Connection);
@@ -124,6 +181,7 @@ public:
         toolBar->addAction(actionAddNode);
         toolBar->addAction(actionAddConnection);
         toolBar->addAction(actionDelete_Connection);
+        toolBar->addAction(actionDelete_Node);
 
         retranslateUi(MainWindow);
 
@@ -155,10 +213,14 @@ public:
 #if QT_CONFIG(tooltip)
         actionDelete_Connection->setToolTip(QCoreApplication::translate("MainWindow", "Delete Connection", nullptr));
 #endif // QT_CONFIG(tooltip)
+        actionShow_All->setText(QCoreApplication::translate("MainWindow", "Show All Connections", nullptr));
         menuNode->setTitle(QCoreApplication::translate("MainWindow", "Node", nullptr));
         menuAdd->setTitle(QCoreApplication::translate("MainWindow", "Add", nullptr));
         menuDelete->setTitle(QCoreApplication::translate("MainWindow", "Delete", nullptr));
         toolBar->setWindowTitle(QCoreApplication::translate("MainWindow", "toolBar", nullptr));
+        label->setText(QCoreApplication::translate("MainWindow", "Node ID", nullptr));
+        NodeON->setText(QCoreApplication::translate("MainWindow", "ON", nullptr));
+        NodeOFF->setText(QCoreApplication::translate("MainWindow", "OFF", nullptr));
     } // retranslateUi
 
 };

@@ -26,14 +26,17 @@ EdgeItem* EdgeController::findEdge(Node* a, Node* b)
     return nullptr;
 }
 
+void EdgeController::watchNode(Node* node)
+{
+    connect(node, &Node::moved, this, &EdgeController::updateEdges);
+}
+
 void EdgeController::removeEdge(EdgeItem* edge)
 {
     if (!edge) return;
 
-    // 1) Видалити з графічної сцени
     scene->removeItem(edge);
 
-    // 2) Прибрати з контейнера (і звільнити пам'ять)
     edges.erase(std::remove_if(edges.begin(), edges.end(),
                                [&](const std::unique_ptr<EdgeItem>& p){ return p.get() == edge; }),
                 edges.end());
@@ -44,3 +47,4 @@ void EdgeController::updateEdges()
     for (auto& e : edges)
         e->updatePosition();
 }
+
