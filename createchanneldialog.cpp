@@ -2,7 +2,7 @@
 #include "ui_createchanneldialog.h"
 #include <QIntValidator>
 #include <QPushButton>
-
+#include <QMessageBox>
 
 
 CreateChannelDialog::CreateChannelDialog(QWidget *parent)
@@ -78,6 +78,16 @@ Node* CreateChannelDialog::getNodeB() const
 int CreateChannelDialog::getWeight() const
 {
     return ui->lineEdit->text().toInt();
+}
+
+void CreateChannelDialog::accept()
+{
+    if(!getNodeA() || !getNodeB()) {
+        QMessageBox::warning(this, "No nodes selected", "Please select both nodes");
+        return;
+    }
+
+    QDialog::accept();
 }
 
 

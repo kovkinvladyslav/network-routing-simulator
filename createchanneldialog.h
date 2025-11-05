@@ -24,6 +24,10 @@ public:
     Node* getNodeA() const;
     Node* getNodeB() const;
     int getWeight() const;
+
+protected:
+    void accept() override;
+
 private slots:
     void on_Weight_Random_toggled(bool checked);
 
