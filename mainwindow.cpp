@@ -3,6 +3,8 @@
 #include "graph.h"
 #include "createchanneldialog.h"
 #include <QDialog>
+#include <QMessageBox>
+#include "removechanneldialog.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -73,7 +75,6 @@ void MainWindow::on_actionAddConnection_triggered()
     if(dlg.exec() == QDialog::Accepted) {
         Node* a = dlg.getNodeA();
         Node* b = dlg.getNodeB();
-        bool duplex = dlg.isDuplex();
         bool randomWeight = dlg.isRandomWeight();
         int weight = 0;
         if(randomWeight) {
@@ -82,9 +83,45 @@ void MainWindow::on_actionAddConnection_triggered()
         } else {
             weight = dlg.getWeight();
         }
-        graph->connect(a, b, duplex, weight);
-        edgeController->addEdge(a, b, weight);
+        ChannelType type = dlg.getChannelType();
+        ChannelMode mode = dlg.getChannelMode();
+
+        graph->connect(a, b, type, mode, weight);
+        edgeController->addEdge(a, b, weight, type, mode);
     }
 }
 
+
+
+void MainWindow::on_actionDelete_Connection_triggered()
+{
+    RemoveChannelDialog dlg(this);
+    dlg.setNodesList(graph->getAllNodes());
+
+    auto selected = ui->graphicsView->scene()->selectedItems();
+    if (selected.size() >= 1)
+        dlg.presetNodes(qgraphicsitem_cast<Node*>(selected[0]), nullptr);
+    if (selected.size() >= 2)
+        dlg.presetNodes(qgraphicsitem_cast<Node*>(selected[0]),
+                        qgraphicsitem_cast<Node*>(selected[1]));
+
+    if (dlg.exec() == QDialog::Accepted) {
+
+        Node* a = dlg.getNodeA();
+        Node* b = dlg.getNodeB();
+
+        auto& adj = a->get_adj();
+        if (!adj.count(b)) {
+            QMessageBox::warning(this, "No Connection", "These nodes are not connected.");
+            return;
+        }
+
+
+
+        graph->removeConnection(a, b);
+        EdgeItem* e = edgeController->findEdge(a, b);
+        edgeController->removeEdge(e);
+    }
+
+}
 

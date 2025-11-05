@@ -19,8 +19,8 @@
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
-#include <QtWidgets/QLineEdit>
 #include <QtWidgets/QRadioButton>
+#include <QtWidgets/QSpinBox>
 #include <QtWidgets/QVBoxLayout>
 
 QT_BEGIN_NAMESPACE
@@ -40,6 +40,10 @@ public:
     QHBoxLayout *horizontalLayout_3;
     QRadioButton *Type_Half_Duplex;
     QRadioButton *Duplex;
+    QGroupBox *groupBox_3;
+    QHBoxLayout *horizontalLayout_4;
+    QRadioButton *Normal;
+    QRadioButton *Satelite;
     QGroupBox *groupBox_2;
     QGridLayout *gridLayout;
     QRadioButton *Weight_Random;
@@ -47,14 +51,14 @@ public:
     QGroupBox *manualWeightGroup;
     QHBoxLayout *horizontalLayout;
     QLabel *label_3;
-    QLineEdit *lineEdit;
+    QSpinBox *spinBox;
     QDialogButtonBox *buttonBox;
 
     void setupUi(QDialog *CreateChannelDialog)
     {
         if (CreateChannelDialog->objectName().isEmpty())
             CreateChannelDialog->setObjectName("CreateChannelDialog");
-        CreateChannelDialog->resize(400, 371);
+        CreateChannelDialog->resize(400, 452);
         QSizePolicy sizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::MinimumExpanding);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -116,6 +120,24 @@ public:
 
         verticalLayout->addWidget(groupBox);
 
+        groupBox_3 = new QGroupBox(CreateChannelDialog);
+        groupBox_3->setObjectName("groupBox_3");
+        horizontalLayout_4 = new QHBoxLayout(groupBox_3);
+        horizontalLayout_4->setObjectName("horizontalLayout_4");
+        Normal = new QRadioButton(groupBox_3);
+        Normal->setObjectName("Normal");
+        Normal->setChecked(true);
+
+        horizontalLayout_4->addWidget(Normal);
+
+        Satelite = new QRadioButton(groupBox_3);
+        Satelite->setObjectName("Satelite");
+
+        horizontalLayout_4->addWidget(Satelite);
+
+
+        verticalLayout->addWidget(groupBox_3);
+
         groupBox_2 = new QGroupBox(CreateChannelDialog);
         groupBox_2->setObjectName("groupBox_2");
         gridLayout = new QGridLayout(groupBox_2);
@@ -150,10 +172,12 @@ public:
 
         horizontalLayout->addWidget(label_3);
 
-        lineEdit = new QLineEdit(manualWeightGroup);
-        lineEdit->setObjectName("lineEdit");
+        spinBox = new QSpinBox(manualWeightGroup);
+        spinBox->setObjectName("spinBox");
+        spinBox->setMinimum(1);
+        spinBox->setMaximum(2147483647);
 
-        horizontalLayout->addWidget(lineEdit);
+        horizontalLayout->addWidget(spinBox);
 
 
         verticalLayout->addWidget(manualWeightGroup);
@@ -178,6 +202,9 @@ public:
         groupBox->setTitle(QCoreApplication::translate("CreateChannelDialog", "Choose channel type:", nullptr));
         Type_Half_Duplex->setText(QCoreApplication::translate("CreateChannelDialog", "Half-Duplex", nullptr));
         Duplex->setText(QCoreApplication::translate("CreateChannelDialog", "Duplex", nullptr));
+        groupBox_3->setTitle(QCoreApplication::translate("CreateChannelDialog", "Choose channel mode:", nullptr));
+        Normal->setText(QCoreApplication::translate("CreateChannelDialog", "Normal", nullptr));
+        Satelite->setText(QCoreApplication::translate("CreateChannelDialog", "Satelite", nullptr));
         groupBox_2->setTitle(QCoreApplication::translate("CreateChannelDialog", "Choose how to set a weight:", nullptr));
         Weight_Random->setText(QCoreApplication::translate("CreateChannelDialog", "Random", nullptr));
         Weight_Manually->setText(QCoreApplication::translate("CreateChannelDialog", "Manually", nullptr));

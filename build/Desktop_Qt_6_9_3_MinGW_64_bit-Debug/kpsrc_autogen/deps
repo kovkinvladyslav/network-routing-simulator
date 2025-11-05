@@ -609,6 +609,9 @@ kpsrc_autogen/timestamp: \
 	C:/Users/admin/Desktop/prog/networks/kpsrc/node.h \
 	C:/Users/admin/Desktop/prog/networks/kpsrc/nodeselector.cpp \
 	C:/Users/admin/Desktop/prog/networks/kpsrc/nodeselector.h \
+	C:/Users/admin/Desktop/prog/networks/kpsrc/removechanneldialog.cpp \
+	C:/Users/admin/Desktop/prog/networks/kpsrc/removechanneldialog.h \
 	C:/Users/admin/Desktop/prog/networks/kpsrc/createchanneldialog.ui \
 	C:/Users/admin/Desktop/prog/networks/kpsrc/mainwindow.ui \
+	C:/Users/admin/Desktop/prog/networks/kpsrc/removechanneldialog.ui \
 	C:/Qt/Tools/CMake_64/bin/cmake.exe

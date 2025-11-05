@@ -387,6 +387,12 @@
 			"MU",
 			"EWIEGA46WW/moc_nodeselector.cpp",
 			null
+		],
+		[
+			"C:/Users/admin/Desktop/prog/networks/kpsrc/removechanneldialog.h",
+			"MU",
+			"EWIEGA46WW/moc_removechanneldialog.cpp",
+			null
 		]
 	],
 	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
@@ -481,6 +487,11 @@
 		[ "C:/Users/admin/Desktop/prog/networks/kpsrc/node.cpp", "MU", null ],
 		[
 			"C:/Users/admin/Desktop/prog/networks/kpsrc/nodeselector.cpp",
+			"MU",
+			null
+		],
+		[
+			"C:/Users/admin/Desktop/prog/networks/kpsrc/removechanneldialog.cpp",
 			"MU",
 			null
 		]

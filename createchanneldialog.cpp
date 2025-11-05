@@ -26,21 +26,21 @@ CreateChannelDialog::CreateChannelDialog(QWidget *parent)
     });
 
 
-    ui->lineEdit->setValidator(new QIntValidator(1, INT_MAX, this));
 
     ui->manualWeightGroup->setVisible(false);
 
 }
 
-bool CreateChannelDialog::isDuplex()
+bool CreateChannelDialog::isDuplex() const
 {
     return ui->Duplex->isChecked();
 }
 
-bool CreateChannelDialog::isRandomWeight()
+bool CreateChannelDialog::isRandomWeight() const
 {
-    return ui->Type_Half_Duplex->isChecked();
+    return ui->Weight_Random->isChecked();
 }
+
 
 void CreateChannelDialog::setNodesList(const std::vector<Node*>& nodes)
 {
@@ -77,14 +77,21 @@ Node* CreateChannelDialog::getNodeB() const
 
 int CreateChannelDialog::getWeight() const
 {
-    return ui->lineEdit->text().toInt();
+    return ui->spinBox->value();
 }
 
 void CreateChannelDialog::accept()
 {
-    if(!getNodeA() || !getNodeB()) {
+    if (!getNodeA() || !getNodeB()) {
         QMessageBox::warning(this, "No nodes selected", "Please select both nodes");
         return;
+    }
+
+    if (!isRandomWeight()) {
+        if (ui->spinBox->value() < 1) {
+            QMessageBox::warning(this, "Invalid weight", "Weight must be at least 1.");
+            return;
+        }
     }
 
     QDialog::accept();
@@ -104,5 +111,14 @@ void CreateChannelDialog::on_Weight_Manually_toggled(bool checked)
     ui->manualWeightGroup->setVisible(checked);
 }
 
+ChannelType CreateChannelDialog::getChannelType() const
+{
+    return isDuplex() ? ChannelType::Duplex : ChannelType::HalfDuplex;
+}
+
+ChannelMode CreateChannelDialog::getChannelMode() const
+{
+    return (ui->Satelite->isChecked()) ? ChannelMode::Satellite : ChannelMode::Normal;
+}
 
 

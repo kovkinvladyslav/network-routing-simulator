@@ -156,6 +156,7 @@ C:/Users/admin/Desktop/prog/networks/kpsrc/build/Desktop_Qt_6_9_3_MinGW_64_bit-D
   C:/Qt/6.9.3/mingw_64/include/QtGui/qwindowdefs_win.h \
   C:/Qt/6.9.3/mingw_64/include/QtWidgets/QDialog \
   C:/Qt/6.9.3/mingw_64/include/QtWidgets/QGraphicsEllipseItem \
+  C:/Qt/6.9.3/mingw_64/include/QtWidgets/QGraphicsLineItem \
   C:/Qt/6.9.3/mingw_64/include/QtWidgets/qdialog.h \
   C:/Qt/6.9.3/mingw_64/include/QtWidgets/qgraphicsitem.h \
   C:/Qt/6.9.3/mingw_64/include/QtWidgets/qsizepolicy.h \
@@ -376,4 +377,5 @@ C:/Users/admin/Desktop/prog/networks/kpsrc/build/Desktop_Qt_6_9_3_MinGW_64_bit-D
   C:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include/time.h \
   C:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include/vadefs.h \
   C:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include/wchar.h \
+  C:/Users/admin/Desktop/prog/networks/kpsrc/edgeitem.h \
   C:/Users/admin/Desktop/prog/networks/kpsrc/node.h

@@ -26,7 +26,6 @@ QT_BEGIN_NAMESPACE
 class Ui_MainWindow
 {
 public:
-    QAction *actionDelete;
     QAction *actionClear;
     QAction *actionSave;
     QAction *actionOpen;
@@ -34,6 +33,9 @@ public:
     QAction *actionZoom_Out;
     QAction *actionAddNode;
     QAction *actionAddConnection;
+    QAction *actionDelete_Node;
+    QAction *actionDelete_Node_2;
+    QAction *actionDelete_Connection;
     QWidget *centralwidget;
     QVBoxLayout *verticalLayout;
     QGraphicsView *graphicsView;
@@ -41,6 +43,7 @@ public:
     QMenuBar *menubar;
     QMenu *menuNode;
     QMenu *menuAdd;
+    QMenu *menuDelete;
     QToolBar *toolBar;
 
     void setupUi(QMainWindow *MainWindow)
@@ -48,8 +51,6 @@ public:
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName("MainWindow");
         MainWindow->resize(800, 600);
-        actionDelete = new QAction(MainWindow);
-        actionDelete->setObjectName("actionDelete");
         actionClear = new QAction(MainWindow);
         actionClear->setObjectName("actionClear");
         actionSave = new QAction(MainWindow);
@@ -68,6 +69,12 @@ public:
         actionAddNode->setObjectName("actionAddNode");
         actionAddConnection = new QAction(MainWindow);
         actionAddConnection->setObjectName("actionAddConnection");
+        actionDelete_Node = new QAction(MainWindow);
+        actionDelete_Node->setObjectName("actionDelete_Node");
+        actionDelete_Node_2 = new QAction(MainWindow);
+        actionDelete_Node_2->setObjectName("actionDelete_Node_2");
+        actionDelete_Connection = new QAction(MainWindow);
+        actionDelete_Connection->setObjectName("actionDelete_Connection");
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName("centralwidget");
         verticalLayout = new QVBoxLayout(centralwidget);
@@ -93,6 +100,8 @@ public:
         menuNode->setObjectName("menuNode");
         menuAdd = new QMenu(menuNode);
         menuAdd->setObjectName("menuAdd");
+        menuDelete = new QMenu(menuNode);
+        menuDelete->setObjectName("menuDelete");
         MainWindow->setMenuBar(menubar);
         toolBar = new QToolBar(MainWindow);
         toolBar->setObjectName("toolBar");
@@ -100,7 +109,7 @@ public:
 
         menubar->addAction(menuNode->menuAction());
         menuNode->addAction(menuAdd->menuAction());
-        menuNode->addAction(actionDelete);
+        menuNode->addAction(menuDelete->menuAction());
         menuNode->addAction(actionClear);
         menuNode->addAction(actionSave);
         menuNode->addAction(actionOpen);
@@ -108,10 +117,13 @@ public:
         menuNode->addAction(actionZoom_Out);
         menuAdd->addAction(actionAddNode);
         menuAdd->addAction(actionAddConnection);
+        menuDelete->addAction(actionDelete_Connection);
+        menuDelete->addAction(actionDelete_Node);
         toolBar->addAction(actionZoom_In);
         toolBar->addAction(actionZoom_Out);
         toolBar->addAction(actionAddNode);
         toolBar->addAction(actionAddConnection);
+        toolBar->addAction(actionDelete_Connection);
 
         retranslateUi(MainWindow);
 
@@ -121,7 +133,6 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
-        actionDelete->setText(QCoreApplication::translate("MainWindow", "Delete", nullptr));
         actionClear->setText(QCoreApplication::translate("MainWindow", "Clear", nullptr));
         actionSave->setText(QCoreApplication::translate("MainWindow", "Save", nullptr));
         actionOpen->setText(QCoreApplication::translate("MainWindow", "Open", nullptr));
@@ -138,8 +149,15 @@ public:
 #if QT_CONFIG(shortcut)
         actionAddConnection->setShortcut(QCoreApplication::translate("MainWindow", "C", nullptr));
 #endif // QT_CONFIG(shortcut)
+        actionDelete_Node->setText(QCoreApplication::translate("MainWindow", "Delete Node", nullptr));
+        actionDelete_Node_2->setText(QCoreApplication::translate("MainWindow", "Delete Node", nullptr));
+        actionDelete_Connection->setText(QCoreApplication::translate("MainWindow", "Delete Connection", nullptr));
+#if QT_CONFIG(tooltip)
+        actionDelete_Connection->setToolTip(QCoreApplication::translate("MainWindow", "Delete Connection", nullptr));
+#endif // QT_CONFIG(tooltip)
         menuNode->setTitle(QCoreApplication::translate("MainWindow", "Node", nullptr));
         menuAdd->setTitle(QCoreApplication::translate("MainWindow", "Add", nullptr));
+        menuDelete->setTitle(QCoreApplication::translate("MainWindow", "Delete", nullptr));
         toolBar->setWindowTitle(QCoreApplication::translate("MainWindow", "toolBar", nullptr));
     } // retranslateUi
 

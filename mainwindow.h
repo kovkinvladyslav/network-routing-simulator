@@ -29,6 +29,8 @@ private slots:
 
     void on_actionAddConnection_triggered();
 
+    void on_actionDelete_Connection_triggered();
+
 private:
     Ui::MainWindow *ui;
     Graph* graph;

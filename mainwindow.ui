@@ -57,8 +57,15 @@
      <addaction name="actionAddNode"/>
      <addaction name="actionAddConnection"/>
     </widget>
+    <widget class="QMenu" name="menuDelete">
+     <property name="title">
+      <string>Delete</string>
+     </property>
+     <addaction name="actionDelete_Connection"/>
+     <addaction name="actionDelete_Node"/>
+    </widget>
     <addaction name="menuAdd"/>
-    <addaction name="actionDelete"/>
+    <addaction name="menuDelete"/>
     <addaction name="actionClear"/>
     <addaction name="actionSave"/>
     <addaction name="actionOpen"/>
@@ -81,12 +88,8 @@
    <addaction name="actionZoom_Out"/>
    <addaction name="actionAddNode"/>
    <addaction name="actionAddConnection"/>
+   <addaction name="actionDelete_Connection"/>
   </widget>
-  <action name="actionDelete">
-   <property name="text">
-    <string>Delete</string>
-   </property>
-  </action>
   <action name="actionClear">
    <property name="text">
     <string>Clear</string>
@@ -135,6 +138,24 @@
    </property>
    <property name="shortcut">
     <string>C</string>
+   </property>
+  </action>
+  <action name="actionDelete_Node">
+   <property name="text">
+    <string>Delete Node</string>
+   </property>
+  </action>
+  <action name="actionDelete_Node_2">
+   <property name="text">
+    <string>Delete Node</string>
+   </property>
+  </action>
+  <action name="actionDelete_Connection">
+   <property name="text">
+    <string>Delete Connection</string>
+   </property>
+   <property name="toolTip">
+    <string>Delete Connection</string>
    </property>
   </action>
  </widget>

@@ -22,8 +22,34 @@ std::vector<Node *> Graph::getAllNodes() const
     return result;
 }
 
-void Graph::connect(Node *nodeA, Node *nodeB, bool isDuplex, int weight)
+void Graph::connect(Node* nodeA, Node* nodeB, ChannelType type, ChannelMode mode, int weight)
 {
-    nodeA->add_adj(nodeB, weight);
+    nodeA->add_adj(nodeB, weight, type, mode);
+    nodeB->add_adj(nodeA, weight, type, mode);
 }
+constexpr double SATELLITE_LATENCY = 0.25;
+
+double Graph::computeTransmissionTime(const ChannelProperties &ch, int packetBytes)
+{
+    double t = (packetBytes / 100.0) * ch.weight;
+
+    if (ch.type == ChannelType::HalfDuplex)
+        t *= 2;
+
+    if (ch.mode == ChannelMode::Satellite)
+        t += SATELLITE_LATENCY;
+
+    return t;
+}
+
+void Graph::removeConnection(Node* a, Node* b)
+{
+    if (!a || !b) return;
+
+    a->removeAdj(b);
+    b->removeAdj(a);
+}
+
+
+
 

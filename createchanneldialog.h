@@ -17,13 +17,16 @@ class CreateChannelDialog : public QDialog
 public:
     explicit CreateChannelDialog(QWidget *parent = nullptr);
 
-    bool isDuplex();
-    bool isRandomWeight();
+    bool isDuplex() const;
+    bool isRandomWeight() const;
     void setNodesList(const std::vector<Node*>& nodes);
     void presetNodes(Node *a, Node *b);
     Node* getNodeA() const;
     Node* getNodeB() const;
     int getWeight() const;
+    ChannelType getChannelType() const;
+    ChannelMode getChannelMode() const;
+
 
 protected:
     void accept() override;
