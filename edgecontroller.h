@@ -5,16 +5,16 @@
 #include <vector>
 #include <memory>
 #include "edgeitem.h"
+#include "graph.h"
 
 class QGraphicsScene;
 class Node;
-class EdgeItem;
 
 class EdgeController : public QObject
 {
     Q_OBJECT
 public:
-    EdgeController(QGraphicsScene* scene);
+    EdgeController(QGraphicsScene* scene, Graph* graph);
     void addEdge(Node* a, Node* b, const ChannelProperties& props);
     void removeEdge(EdgeItem* edge);
     EdgeItem* findEdge(Node* a, Node* b);
@@ -27,6 +27,7 @@ private slots:
     void updateEdges();
 
 private:
+    Graph* graph;
     QGraphicsScene* scene;
     std::vector<std::unique_ptr<EdgeItem>> edges;
 };

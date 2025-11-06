@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     selector = new NodeSelector(scene);
 
-    edgeController = new EdgeController(scene);
+    edgeController = new EdgeController(scene, graph);
     connect(edgeController, &EdgeController::routingChanged,
             this, &MainWindow::updateRouting);
 
@@ -241,7 +241,7 @@ void MainWindow::on_actionGenerate_topology_triggered()
     ui->graphicsView->scene()->clear();
 
     graph = new Graph(ui->graphicsView->scene());
-    edgeController = new EdgeController(ui->graphicsView->scene());
+    edgeController = new EdgeController(ui->graphicsView->scene(), graph);
 
     const int nodeCount = 24;
     std::vector<Node*> nodes;

@@ -4,8 +4,9 @@
 #include <QGraphicsScene>
 #include <algorithm>
 
-EdgeController::EdgeController(QGraphicsScene* scene)
-    : scene(scene) {}
+EdgeController::EdgeController(QGraphicsScene* scene, Graph* graph)
+    : scene(scene), graph(graph) {}
+
 
 void EdgeController::addEdge(Node* a, Node* b, const ChannelProperties& props)
 {
@@ -30,16 +31,19 @@ void EdgeController::watchNode(Node* node)
 {
     connect(node, &Node::moved, this, &EdgeController::updateEdges);
 }
-
 void EdgeController::removeEdge(EdgeItem* edge)
 {
     if (!edge) return;
+
+    graph->removeConnection(edge->a, edge->b);
 
     scene->removeItem(edge);
 
     edges.erase(std::remove_if(edges.begin(), edges.end(),
                                [&](const std::unique_ptr<EdgeItem>& p){ return p.get() == edge; }),
                 edges.end());
+
+    emit routingChanged();
 }
 
 void EdgeController::updateEdges()
