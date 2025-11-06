@@ -7,10 +7,9 @@
 EdgeController::EdgeController(QGraphicsScene* scene)
     : scene(scene) {}
 
-void EdgeController::addEdge(Node* a, Node* b, int weight, ChannelType type, ChannelMode mode)
+void EdgeController::addEdge(Node* a, Node* b, const ChannelProperties& props)
 {
-    auto e = std::make_unique<EdgeItem>(a, b, weight, type, mode);
-
+    auto e = std::make_unique<EdgeItem>(a, b, props);
     connect(e.get(), &EdgeItem::requestRemove,
             this, &EdgeController::removeEdge);
     connect(e.get(), &EdgeItem::channelStateChanged, this, &EdgeController::updateEdges);

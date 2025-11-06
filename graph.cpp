@@ -31,11 +31,12 @@ std::vector<Node *> Graph::getAllNodes() const
     return result;
 }
 
-void Graph::connect(Node* nodeA, Node* nodeB, ChannelType type, ChannelMode mode, int weight)
+void Graph::connect(Node* nodeA, Node* nodeB, const ChannelProperties& props)
 {
-    nodeA->add_adj(nodeB, weight, type, mode);
-    nodeB->add_adj(nodeA, weight, type, mode);
+    nodeA->add_adj(nodeB, props);
+    nodeB->add_adj(nodeA, props);
 }
+
 constexpr double SATELLITE_LATENCY = 0.25;
 
 double Graph::computeTransmissionTime(const ChannelProperties &ch, int packetBytes)

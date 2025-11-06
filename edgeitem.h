@@ -1,17 +1,15 @@
 #ifndef EDGEITEM_H
 #define EDGEITEM_H
-
+#include "ChannelProperties.h"
 #include <QGraphicsLineItem>
-
 class Node;
-enum class ChannelType { Duplex, HalfDuplex };
-enum class ChannelMode { Normal, Satellite };
 
 class EdgeItem : public QObject, public QGraphicsLineItem
 {
     Q_OBJECT
 public:
-    EdgeItem(Node* a, Node* b, int weight, ChannelType type, ChannelMode mode);
+    EdgeItem(Node* a, Node* b, const ChannelProperties& props);
+    ChannelProperties props;
 
     Node* a;
     Node* b;

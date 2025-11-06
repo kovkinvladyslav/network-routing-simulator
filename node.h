@@ -2,6 +2,7 @@
 #define NODE_H
 #include <QGraphicsEllipseItem>
 #include <unordered_map>
+#include "ChannelProperties.h"
 #include <QPointF>
 #include <QObject>
 #include "edgeitem.h"
@@ -12,14 +13,6 @@ enum class NodeState {
     DISCONNECTED
 };
 
-struct ChannelProperties {
-    int weight;
-    ChannelType type;
-    ChannelMode mode;
-    bool active = true;
-};
-
-
 class Node : public QObject, public QGraphicsEllipseItem
 {
     Q_OBJECT
@@ -27,7 +20,7 @@ public:
     Node(int id, QPointF pos);
     const std::unordered_map<Node*, ChannelProperties>& get_adj() const;
     int getId();
-    void add_adj(Node *other, int weight, ChannelType type, ChannelMode mode);
+    void add_adj(Node* other, const ChannelProperties& props);
     void setState(NodeState newState);
     void highlight(bool on);
     void removeAdj(Node* other);

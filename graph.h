@@ -17,7 +17,7 @@ public:
     Graph(QGraphicsScene* scene);
     Node* add_node(std::unique_ptr<Node> node);
     std::vector<Node*> getAllNodes() const;
-    void connect(Node* nodeA, Node* nodeB, ChannelType type, ChannelMode mode, int weight);
+    void connect(Node* nodeA, Node* nodeB, const ChannelProperties& props);
     double computeTransmissionTime(const ChannelProperties& ch, int packetBytes);
     void removeConnection(Node* a, Node* b);
     void removeNode(Node* node);

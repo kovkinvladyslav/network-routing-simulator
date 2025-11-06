@@ -15,7 +15,7 @@ class EdgeController : public QObject
     Q_OBJECT
 public:
     EdgeController(QGraphicsScene* scene);
-    void addEdge(Node* a, Node* b, int weight, ChannelType type, ChannelMode mode);
+    void addEdge(Node* a, Node* b, const ChannelProperties& props);
     void removeEdge(EdgeItem* edge);
     EdgeItem* findEdge(Node* a, Node* b);
     void watchNode(Node* node);

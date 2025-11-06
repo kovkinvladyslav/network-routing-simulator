@@ -4,8 +4,8 @@
 #include <QMenu>
 #include <QGraphicsSceneContextMenuEvent>
 
-EdgeItem::EdgeItem(Node* a, Node* b, int weight, ChannelType type, ChannelMode mode)
-    : QObject(), QGraphicsLineItem(), a(a), b(b), weight(weight), type(type), mode(mode)
+EdgeItem::EdgeItem(Node* a, Node* b, const ChannelProperties& props)
+    : QObject(), QGraphicsLineItem(), a(a), b(b), props(props)
 {
     QPen pen(Qt::white, 2);
 
@@ -14,11 +14,11 @@ EdgeItem::EdgeItem(Node* a, Node* b, int weight, ChannelType type, ChannelMode m
     else
         pen.setStyle(Qt::SolidLine);
 
-    setToolTip(QString("Weight: %1\nType: %2\nMode: %3\nState: %4")
-                   .arg(weight)
-                   .arg(type == ChannelType::Duplex ? "Duplex" : "Half-Duplex")
-                   .arg(mode == ChannelMode::Satellite ? "Satellite" : "Normal")
-                   .arg(active ? "Active" : "Disabled"));
+    setToolTip(QString("Weight: %1\nType: %2\nMode: %3\nError prob: %4")
+                   .arg(props.weight)
+                   .arg(props.type == ChannelType::Duplex ? "Duplex" : "Half-Duplex")
+                   .arg(props.mode == ChannelMode::Satellite ? "Satellite" : "Normal")
+                   .arg(props.errorProb, 0, 'f', 3));
 
 
 

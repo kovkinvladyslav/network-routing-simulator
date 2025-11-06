@@ -2,10 +2,13 @@
 #include "ui_mainwindow.h"
 #include "graph.h"
 #include "createchanneldialog.h"
+#include "removechanneldialog.h"
+#include "ChannelProperties.h"
 #include <QDialog>
 #include <QMessageBox>
 #include <QStandardItem>
-#include "removechanneldialog.h"
+#include <QGraphicsScene>
+#include <math.h>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -85,8 +88,10 @@ void MainWindow::on_actionAddConnection_triggered()
         ChannelType type = dlg.getChannelType();
         ChannelMode mode = dlg.getChannelMode();
 
-        graph->connect(a, b, type, mode, weight);
-        edgeController->addEdge(a, b, weight, type, mode);
+        ChannelProperties props{ weight, type, mode };
+
+        graph->connect(a, b, props);
+        edgeController->addEdge(a, b, props);
     }
 }
 
@@ -155,8 +160,8 @@ void MainWindow::onNodeSelected(Node* node)
     ui->NodeOFF->blockSignals(false);
 
     auto& adj = node->get_adj();
-    QStandardItemModel* model = new QStandardItemModel(adj.size(), 4, this);
-    model->setHorizontalHeaderLabels({"Neighbor", "Weight", "Type", "Mode"});
+    QStandardItemModel* model = new QStandardItemModel(adj.size(), 5, this);
+    model->setHorizontalHeaderLabels({"Neighbor", "Weight", "Type", "Mode", "ErrProb"});
 
     int row = 0;
     for (auto& [nbr, props] : adj) {
@@ -164,6 +169,7 @@ void MainWindow::onNodeSelected(Node* node)
         model->setItem(row, 1, new QStandardItem(QString::number(props.weight)));
         model->setItem(row, 2, new QStandardItem(props.type == ChannelType::Duplex ? "Duplex" : "Half-Duplex"));
         model->setItem(row, 3, new QStandardItem(props.mode == ChannelMode::Satellite ? "Satellite" : "Normal"));
+        model->setItem(row, 4, new QStandardItem(QString::number(props.errorProb, 'f', 3)));
         row++;
     }
 
@@ -182,11 +188,11 @@ void MainWindow::on_NodeOFF_toggled(bool checked)
         currentNode->setState(NodeState::OFF);
 }
 
-void MainWindow::updateRouting() {
+void MainWindow::updateRouting()
+{
     if (currentNode)
         onNodeSelected(currentNode);
 }
-
 
 void MainWindow::on_actionDelete_Node_triggered()
 {
@@ -244,8 +250,8 @@ void MainWindow::on_actionGenerate_topology_triggered()
         double angle = (2 * M_PI * i) / nodeCount;
         double centerX = 400, centerY = 300;
         double radius = 250;
-        QPointF pos(centerX + radius * cos(angle),
-                    centerY + radius * sin(angle));
+        QPointF pos(centerX + radius * std::cos(angle),
+                    centerY + radius * std::sin(angle));
         Node* node = graph->add_node(std::make_unique<Node>(i + 1, pos));
         nodes.push_back(node);
         edgeController->watchNode(node);
@@ -255,8 +261,9 @@ void MainWindow::on_actionGenerate_topology_triggered()
         Node* a = nodes[i];
         Node* b = nodes[rand() % i];
         int w = Graph::ALLOWED_RANDOM_WEIGHTS[rand() % Graph::ALLOWED_RANDOM_WEIGHTS.size()];
-        graph->connect(a, b, ChannelType::Duplex, ChannelMode::Normal, w);
-        edgeController->addEdge(a, b, w, ChannelType::Duplex, ChannelMode::Normal);
+        ChannelProperties props{ w, ChannelType::Duplex, ChannelMode::Normal };
+        graph->connect(a, b, props);
+        edgeController->addEdge(a, b, props);
     }
 
     for (int k = 0; k < nodeCount / 2; ++k) {
@@ -264,8 +271,9 @@ void MainWindow::on_actionGenerate_topology_triggered()
         Node* b = nodes[rand() % nodeCount];
         if (a == b || edgeController->findEdge(a, b)) continue;
         int w = Graph::ALLOWED_RANDOM_WEIGHTS[rand() % Graph::ALLOWED_RANDOM_WEIGHTS.size()];
-        graph->connect(a, b, ChannelType::Duplex, ChannelMode::Normal, w);
-        edgeController->addEdge(a, b, w, ChannelType::Duplex, ChannelMode::Normal);
+        ChannelProperties props{ w, ChannelType::Duplex, ChannelMode::Normal };
+        graph->connect(a, b, props);
+        edgeController->addEdge(a, b, props);
     }
 
     int sat = 0;
@@ -274,8 +282,9 @@ void MainWindow::on_actionGenerate_topology_triggered()
         Node* b = nodes[rand() % nodeCount];
         if (a == b || edgeController->findEdge(a, b)) continue;
         int w = Graph::ALLOWED_RANDOM_WEIGHTS[rand() % Graph::ALLOWED_RANDOM_WEIGHTS.size()];
-        graph->connect(a, b, ChannelType::Duplex, ChannelMode::Satellite, w);
-        edgeController->addEdge(a, b, w, ChannelType::Duplex, ChannelMode::Satellite);
+        ChannelProperties props{ w, ChannelType::Duplex, ChannelMode::Satellite };
+        graph->connect(a, b, props);
+        edgeController->addEdge(a, b, props);
         sat++;
     }
 
@@ -287,4 +296,3 @@ void MainWindow::on_actionArrange_Graph_triggered()
 {
     graph->applyForceDirectedLayout();
 }
-

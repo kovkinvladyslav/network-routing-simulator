@@ -28,15 +28,12 @@ int Node::getId()
     return id;
 }
 
-void Node::add_adj(Node *other, int weight, ChannelType type, ChannelMode mode)
+void Node::add_adj(Node* other, const ChannelProperties& props)
 {
-    if(state != NodeState::OFF) {
-        setState(NodeState::ON);
-    }
-    if(other->getState() != NodeState::OFF) {
-        other->setState(NodeState::ON);
-    }
-    adj_nodes[other] = { weight, type, mode };
+    if(state != NodeState::OFF) setState(NodeState::ON);
+    if(other->getState() != NodeState::OFF) other->setState(NodeState::ON);
+
+    adj_nodes[other] = props;
 }
 
 
