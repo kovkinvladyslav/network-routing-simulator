@@ -6,7 +6,7 @@
 #include <memory>
 #include <QPointF>
 #include <unordered_set>
-
+#include "routetypes.h"
 
 class Graph
 {
@@ -22,6 +22,11 @@ public:
     void removeConnection(Node* a, Node* b);
     void removeNode(Node* node);
     void applyForceDirectedLayout();
+    double edgeCost(const ChannelProperties& p, RouteMetric metric) const;
+
+    RouteTable computeRoutingFrom(Node* src, RouteMetric metric);
+    std::vector<Node*> shortestPath(Node* src, Node* dst, RouteMetric metric);
+
 
 private:
 

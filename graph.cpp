@@ -157,3 +157,102 @@ void Graph::removeNode(Node* node)
     if (it != nodes.end()) nodes.erase(it);
 }
 
+
+double Graph::edgeCost(const ChannelProperties& p, RouteMetric metric) const {
+    if (metric == RouteMetric::MinHops)
+        return 1.0;
+
+    double type_factor = (p.type == ChannelType::Duplex ? 1.0 : 1.2);
+    double mode_factor = (p.mode == ChannelMode::Satellite ? 1.5 : 1.0);
+    double retry_factor = 1.0 / (1.0 - p.errorProb);
+
+    return p.weight * type_factor * mode_factor * retry_factor;
+}
+
+RouteTable Graph::computeRoutingFrom(Node* src, RouteMetric metric)
+{
+    RouteTable table;
+    std::unordered_map<Node*, double> dist;
+    std::unordered_map<Node*, Node*> parent;
+
+    for (auto& np : nodes) {
+        Node* v = np.get();
+        dist[v] = 1e18;
+        table[v] = RouteEntry{};
+    }
+
+    dist[src] = 0;
+    table[src].cost = 0;
+    table[src].hops = 0;
+
+    std::vector<Node*> q;
+    for (auto& np : nodes) q.push_back(np.get());
+
+    while (!q.empty()) {
+        Node* u = nullptr;
+        double best = 1e18;
+        for (Node* v : q) {
+            if (dist[v] < best) {
+                best = dist[v];
+                u = v;
+            }
+        }
+        if (!u) break;
+
+        q.erase(std::remove(q.begin(), q.end(), u), q.end());
+
+        for (auto& [nbr, props] : u->get_adj()) {
+            double cost = edgeCost(props, metric);
+            if (dist[u] + cost < dist[nbr]) {
+                dist[nbr] = dist[u] + cost;
+                parent[nbr] = u;
+            }
+        }
+    }
+
+    for (auto& np : nodes) {
+        Node* v = np.get();
+        if (v == src) continue;
+
+        Node* cur = v;
+        Node* prev = nullptr;
+        while (parent.count(cur) && parent[cur] != src)
+            cur = parent[cur];
+        if (parent.count(v)) prev = (parent[v] == src ? v : cur);
+
+        if (parent.count(v)) {
+            table[v].nextHop = prev;
+            table[v].cost = dist[v];
+
+            int hops = 0;
+            Node* t = v;
+            while (parent.count(t)) {
+                t = parent[t];
+                hops++;
+            }
+            table[v].hops = hops;
+        }
+    }
+
+    return table;
+}
+
+std::vector<Node*> Graph::shortestPath(Node* src, Node* dst, RouteMetric metric)
+{
+    auto table = computeRoutingFrom(src, metric);
+    std::vector<Node*> path;
+
+    if (src == dst) return { src };
+
+    Node* cur = dst;
+    while (cur && cur != src) {
+        path.push_back(cur);
+        cur = table[cur].nextHop;
+    }
+    if (!cur) return {};
+    path.push_back(src);
+    std::reverse(path.begin(), path.end());
+    return path;
+}
+
+
