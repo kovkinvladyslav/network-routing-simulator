@@ -20,6 +20,8 @@ public:
     EdgeItem* findEdge(Node* a, Node* b);
     void watchNode(Node* node);
 
+signals:
+    void routingChanged();
 
 private slots:
     void updateEdges();

@@ -72,6 +72,8 @@
     <addaction name="actionZoom_In"/>
     <addaction name="actionZoom_Out"/>
     <addaction name="actionShow_All"/>
+    <addaction name="actionGenerate_topology"/>
+    <addaction name="actionArrange_Graph"/>
    </widget>
    <addaction name="menuNode"/>
   </widget>
@@ -204,6 +206,16 @@
   <action name="actionShow_All">
    <property name="text">
     <string>Show All Connections</string>
+   </property>
+  </action>
+  <action name="actionGenerate_topology">
+   <property name="text">
+    <string>Generate topology</string>
+   </property>
+  </action>
+  <action name="actionArrange_Graph">
+   <property name="text">
+    <string>Arrange Graph</string>
    </property>
   </action>
  </widget>

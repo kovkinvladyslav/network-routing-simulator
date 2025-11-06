@@ -50,6 +50,60 @@ void Graph::removeConnection(Node* a, Node* b)
     b->removeAdj(a);
 }
 
+void Graph::applyForceDirectedLayout()
+{
+    if (nodes.size() <= 1) return;
 
+    const double width = 800;
+    const double height = 600;
+    const double area = width * height;
+    const double k = sqrt(area / nodes.size());
+    const int iterations = 200;
+    const double initialTemp = 40.0;
 
+    std::unordered_map<Node*, QPointF> disp;
 
+    for (int it = 0; it < iterations; ++it) {
+        double temperature = initialTemp * (1.0 - double(it) / iterations);
+
+        for (auto &n : nodes)
+            disp[n.get()] = QPointF(0, 0);
+
+        // repulsion
+        for (auto &a : nodes)
+            for (auto &b : nodes)
+                if (a.get() != b.get()) {
+                    QPointF delta = a->pos() - b->pos();
+                    double dist = std::hypot(delta.x(), delta.y());
+                    if (dist < 0.01) dist = 0.01;
+                    double force = (k * k) / dist;
+                    disp[a.get()] += QPointF(delta.x() / dist * force,
+                                             delta.y() / dist * force);
+                }
+
+        // attraction
+        for (auto &a : nodes) {
+            for (auto &[b, w] : a->get_adj()) {
+                QPointF delta = a->pos() - b->pos();
+                double dist = std::hypot(delta.x(), delta.y());
+                if (dist < 0.01) dist = 0.01;
+                double force = (dist * dist) / k;
+                disp[a.get()] -= QPointF(delta.x() / dist * force,
+                                         delta.y() / dist * force);
+            }
+        }
+
+        for (auto &a : nodes) {
+            QPointF d = disp[a.get()];
+            double mag = std::hypot(d.x(), d.y());
+            if (mag > temperature) {
+                d *= temperature / mag;
+            }
+
+            QPointF newPos = a->pos() + d;
+            newPos.setX(std::clamp(newPos.x(), 50.0, width - 50.0));
+            newPos.setY(std::clamp(newPos.y(), 50.0, height - 50.0));
+            a->setPos(newPos);
+        }
+    }
+}

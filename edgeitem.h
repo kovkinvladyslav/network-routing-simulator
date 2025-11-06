@@ -18,10 +18,14 @@ public:
     int weight;
     ChannelType type;
     ChannelMode mode;
+    bool active = true;
+
 
     void updatePosition();
 signals:
     void requestRemove(EdgeItem* edge);
+    void channelStateChanged();
+
 
 protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;

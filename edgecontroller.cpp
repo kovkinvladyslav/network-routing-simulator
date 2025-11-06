@@ -2,6 +2,7 @@
 #include "edgeitem.h"
 #include "node.h"
 #include <QGraphicsScene>
+#include <algorithm>
 
 EdgeController::EdgeController(QGraphicsScene* scene)
     : scene(scene) {}
@@ -12,11 +13,11 @@ void EdgeController::addEdge(Node* a, Node* b, int weight, ChannelType type, Cha
 
     connect(e.get(), &EdgeItem::requestRemove,
             this, &EdgeController::removeEdge);
+    connect(e.get(), &EdgeItem::channelStateChanged, this, &EdgeController::updateEdges);
 
     scene->addItem(e.get());
     edges.push_back(std::move(e));
 }
-#include <algorithm>
 
 EdgeItem* EdgeController::findEdge(Node* a, Node* b)
 {
@@ -46,5 +47,7 @@ void EdgeController::updateEdges()
 {
     for (auto& e : edges)
         e->updatePosition();
+    emit routingChanged();
+
 }
 

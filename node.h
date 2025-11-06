@@ -16,6 +16,7 @@ struct ChannelProperties {
     int weight;
     ChannelType type;
     ChannelMode mode;
+    bool active = true;
 };
 
 

@@ -14,14 +14,23 @@ EdgeItem::EdgeItem(Node* a, Node* b, int weight, ChannelType type, ChannelMode m
     else
         pen.setStyle(Qt::SolidLine);
 
-    setToolTip(QString("Weight: %1\nType: %2\nMode: %3")
+    setToolTip(QString("Weight: %1\nType: %2\nMode: %3\nState: %4")
                    .arg(weight)
                    .arg(type == ChannelType::Duplex ? "Duplex" : "Half-Duplex")
-                   .arg(mode == ChannelMode::Satellite ? "Satellite" : "Normal"));
+                   .arg(mode == ChannelMode::Satellite ? "Satellite" : "Normal")
+                   .arg(active ? "Active" : "Disabled"));
+
 
 
     setPen(pen);
     setZValue(-1);
+    if (!active) {
+        QPen p = this->pen();
+        p.setColor(Qt::gray);
+        p.setStyle(Qt::DashDotLine);
+        setPen(p);
+    }
+
     updatePosition();
 }
 
@@ -35,12 +44,35 @@ void EdgeItem::updatePosition()
 void EdgeItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
     QMenu menu;
-    QAction* remove = menu.addAction("Видалити канал");
+    QAction* toggle = menu.addAction(active ? "Disable Channel" : "Enable Channel");
+    QAction* remove = menu.addAction("Remove Channel");
+
     QAction* chosen = menu.exec(event->screenPos());
     if (!chosen) return;
+
+    if (chosen == toggle) {
+        active = !active;
+
+        QPen p = pen();
+        if (active) {
+            p.setColor(Qt::white);
+            p.setStyle(mode == ChannelMode::Satellite ? Qt::DashLine : Qt::SolidLine);
+        } else {
+            p.setColor(Qt::gray);
+            p.setStyle(Qt::DashDotLine);
+        }
+        setPen(p);
+
+        setToolTip(QString("Weight: %1\nType: %2\nMode: %3\nState: %4")
+                       .arg(weight)
+                       .arg(type == ChannelType::Duplex ? "Duplex" : "Half-Duplex")
+                       .arg(mode == ChannelMode::Satellite ? "Satellite" : "Normal")
+                       .arg(active ? "Active" : "Disabled"));
+
+        emit channelStateChanged();
+    }
 
     if (chosen == remove) {
         emit requestRemove(this);
     }
 }
-

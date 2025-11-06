@@ -28,6 +28,12 @@ private slots:
     void onNodeSelected(Node* node);
     void on_NodeON_toggled(bool checked);
     void on_NodeOFF_toggled(bool checked);
+    void updateRouting();
+
+
+    void on_actionGenerate_topology_triggered();
+
+    void on_actionArrange_Graph_triggered();
 
 private:
     Ui::MainWindow *ui;
