@@ -28,6 +28,7 @@ private:
     QGraphicsScene* scene;
     std::vector<std::unique_ptr<Node>> nodes;
     std::unordered_set<Node*> nodes_search;
+
 };
 
 #endif // GRAPH_H

@@ -204,7 +204,6 @@ void MainWindow::on_actionDelete_Node_triggered()
     }
 
     for (Node* node : nodesToDelete) {
-
         std::vector<Node*> neighbors;
         neighbors.reserve(node->get_adj().size());
         for (auto& [nbr, props] : node->get_adj())
@@ -217,8 +216,7 @@ void MainWindow::on_actionDelete_Node_triggered()
             onNodeSelected(nbr);
         }
 
-        ui->graphicsView->scene()->removeItem(node);
-        delete node;
+        graph->removeNode(node);
     }
 
     currentNode = nullptr;
@@ -232,7 +230,10 @@ void MainWindow::on_actionDelete_Node_triggered()
 
 void MainWindow::on_actionGenerate_topology_triggered()
 {
+    delete edgeController;
+    delete graph;
     ui->graphicsView->scene()->clear();
+
     graph = new Graph(ui->graphicsView->scene());
     edgeController = new EdgeController(ui->graphicsView->scene());
 
@@ -243,10 +244,8 @@ void MainWindow::on_actionGenerate_topology_triggered()
         double angle = (2 * M_PI * i) / nodeCount;
         double centerX = 400, centerY = 300;
         double radius = 250;
-
         QPointF pos(centerX + radius * cos(angle),
                     centerY + radius * sin(angle));
-
         Node* node = graph->add_node(std::make_unique<Node>(i + 1, pos));
         nodes.push_back(node);
         edgeController->watchNode(node);
@@ -256,7 +255,6 @@ void MainWindow::on_actionGenerate_topology_triggered()
         Node* a = nodes[i];
         Node* b = nodes[rand() % i];
         int w = Graph::ALLOWED_RANDOM_WEIGHTS[rand() % Graph::ALLOWED_RANDOM_WEIGHTS.size()];
-
         graph->connect(a, b, ChannelType::Duplex, ChannelMode::Normal, w);
         edgeController->addEdge(a, b, w, ChannelType::Duplex, ChannelMode::Normal);
     }
@@ -265,7 +263,6 @@ void MainWindow::on_actionGenerate_topology_triggered()
         Node* a = nodes[rand() % nodeCount];
         Node* b = nodes[rand() % nodeCount];
         if (a == b || edgeController->findEdge(a, b)) continue;
-
         int w = Graph::ALLOWED_RANDOM_WEIGHTS[rand() % Graph::ALLOWED_RANDOM_WEIGHTS.size()];
         graph->connect(a, b, ChannelType::Duplex, ChannelMode::Normal, w);
         edgeController->addEdge(a, b, w, ChannelType::Duplex, ChannelMode::Normal);
@@ -276,17 +273,15 @@ void MainWindow::on_actionGenerate_topology_triggered()
         Node* a = nodes[rand() % nodeCount];
         Node* b = nodes[rand() % nodeCount];
         if (a == b || edgeController->findEdge(a, b)) continue;
-
         int w = Graph::ALLOWED_RANDOM_WEIGHTS[rand() % Graph::ALLOWED_RANDOM_WEIGHTS.size()];
         graph->connect(a, b, ChannelType::Duplex, ChannelMode::Satellite, w);
         edgeController->addEdge(a, b, w, ChannelType::Duplex, ChannelMode::Satellite);
         sat++;
     }
+
     graph->applyForceDirectedLayout();
     QMessageBox::information(this, "Done", "Topology generated according to Variant 10.");
-
 }
-
 
 void MainWindow::on_actionArrange_Graph_triggered()
 {
