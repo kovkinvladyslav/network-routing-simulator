@@ -13,9 +13,6 @@ public:
 
     Node* a;
     Node* b;
-    int weight;
-    ChannelType type;
-    ChannelMode mode;
     bool active = true;
 
 

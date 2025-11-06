@@ -54,3 +54,42 @@ void EdgeController::updateEdges()
 
 }
 
+void EdgeController::clearHighlight()
+{
+    for (auto &e : edges) {
+        QPen p = e->pen();
+        p.setWidth(2);
+        p.setColor(Qt::white);
+        e->setPen(p);
+    }
+}
+
+void EdgeController::highlightPath(const std::vector<Node*>& path)
+{
+    clearHighlight();
+    for (int i = 0; i + 1 < (int)path.size(); ++i) {
+        Node* u = path[i];
+        Node* v = path[i+1];
+        if (auto e = findEdge(u, v)) {
+            QPen p = e->pen();
+            p.setWidth(4);
+            p.setColor(Qt::yellow);
+            e->setPen(p);
+        }
+    }
+}
+
+void EdgeController::highlightRelaxations(const std::vector<std::pair<Node*,Node*>>& relaxEdges)
+{
+    clearHighlight();
+    for (auto& [u, v] : relaxEdges) {
+        if (auto e = findEdge(u, v)) {
+            QPen p = e->pen();
+            p.setWidth(4);
+            p.setColor(Qt::cyan);
+            e->setPen(p);
+        }
+    }
+}
+
+

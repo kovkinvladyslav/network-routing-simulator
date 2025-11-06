@@ -19,6 +19,9 @@ public:
     void removeEdge(EdgeItem* edge);
     EdgeItem* findEdge(Node* a, Node* b);
     void watchNode(Node* node);
+    void highlightPath(const std::vector<Node*>& path);
+    void highlightRelaxations(const std::vector<std::pair<Node*,Node*>>& relaxEdges);
+    void clearHighlight();
 
 signals:
     void routingChanged();

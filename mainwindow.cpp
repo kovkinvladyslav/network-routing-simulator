@@ -159,21 +159,7 @@ void MainWindow::onNodeSelected(Node* node)
     ui->NodeON->blockSignals(false);
     ui->NodeOFF->blockSignals(false);
 
-    auto& adj = node->get_adj();
-    QStandardItemModel* model = new QStandardItemModel(adj.size(), 5, this);
-    model->setHorizontalHeaderLabels({"Neighbor", "Weight", "Type", "Mode", "ErrProb"});
-
-    int row = 0;
-    for (auto& [nbr, props] : adj) {
-        model->setItem(row, 0, new QStandardItem(QString::number(nbr->getId())));
-        model->setItem(row, 1, new QStandardItem(QString::number(props.weight)));
-        model->setItem(row, 2, new QStandardItem(props.type == ChannelType::Duplex ? "Duplex" : "Half-Duplex"));
-        model->setItem(row, 3, new QStandardItem(props.mode == ChannelMode::Satellite ? "Satellite" : "Normal"));
-        model->setItem(row, 4, new QStandardItem(QString::number(props.errorProb, 'f', 3)));
-        row++;
-    }
-
-    ui->tableView->setModel(model);
+    updateRouting();
 }
 
 void MainWindow::on_NodeON_toggled(bool checked)
@@ -190,8 +176,23 @@ void MainWindow::on_NodeOFF_toggled(bool checked)
 
 void MainWindow::updateRouting()
 {
-    if (currentNode)
-        onNodeSelected(currentNode);
+    if (!currentNode) return;
+
+    auto table = graph->computeRoutingFrom(currentNode, currentMetric);
+
+    QStandardItemModel* m = new QStandardItemModel(table.size(), 4, this);
+    m->setHorizontalHeaderLabels({"Destination", "Next Hop", "Cost", "Hops"});
+
+    int row = 0;
+    for (auto& [dst, entry] : table) {
+        m->setItem(row, 0, new QStandardItem(QString::number(dst->getId())));
+        m->setItem(row, 1, new QStandardItem(entry.nextHop ? QString::number(entry.nextHop->getId()) : "-"));
+        m->setItem(row, 2, new QStandardItem(QString::number(entry.cost, 'f', 2)));
+        m->setItem(row, 3, new QStandardItem(QString::number(entry.hops)));
+        row++;
+    }
+
+    ui->tableView->setModel(m);
 }
 
 void MainWindow::on_actionDelete_Node_triggered()
@@ -296,3 +297,38 @@ void MainWindow::on_actionArrange_Graph_triggered()
 {
     graph->applyForceDirectedLayout();
 }
+
+
+void MainWindow::on_actionRouting_Next_triggered()
+{
+    if (!stepper || stepper->finished()) return;
+
+    DijkstraStep step;
+    if (stepper->step(step)) {
+        edgeController->highlightRelaxations(step.relaxedEdges);
+        updateRouting();
+    } else {
+        QMessageBox::information(this, "SPF", "Algorythm is finished");
+    }
+
+}
+
+
+void MainWindow::on_actionRouting_Start_triggered()
+{
+    if (!currentNode) return;
+
+    routingSource = currentNode;
+    currentMetric = RouteMetric::EffectiveCost;
+    stepper = new DijkstraStepper(graph, routingSource, currentMetric);
+
+    edgeController->clearHighlight();
+    QMessageBox::information(this, "SPF", "Djkstra started from selected node.");
+}
+
+
+void MainWindow::on_actionRouting_Reset_triggered()
+{
+    edgeController->clearHighlight();
+}
+

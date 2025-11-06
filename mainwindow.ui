@@ -75,7 +75,17 @@
     <addaction name="actionGenerate_topology"/>
     <addaction name="actionArrange_Graph"/>
    </widget>
+   <widget class="QMenu" name="menuRouting">
+    <property name="title">
+     <string>Routing</string>
+    </property>
+    <addaction name="actionStart_SPF"/>
+    <addaction name="actionRouting_Next"/>
+    <addaction name="actionRouting_Start"/>
+    <addaction name="actionRouting_Reset"/>
+   </widget>
    <addaction name="menuNode"/>
+   <addaction name="menuRouting"/>
   </widget>
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
@@ -219,6 +229,26 @@
   <action name="actionArrange_Graph">
    <property name="text">
     <string>Arrange Graph</string>
+   </property>
+  </action>
+  <action name="actionStart_SPF">
+   <property name="text">
+    <string>Start SPF</string>
+   </property>
+  </action>
+  <action name="actionRouting_Next">
+   <property name="text">
+    <string>Next Step</string>
+   </property>
+  </action>
+  <action name="actionRouting_Start">
+   <property name="text">
+    <string>Auto Run</string>
+   </property>
+  </action>
+  <action name="actionRouting_Reset">
+   <property name="text">
+    <string>Reset Highlight</string>
    </property>
   </action>
  </widget>

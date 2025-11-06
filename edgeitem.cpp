@@ -9,27 +9,18 @@ EdgeItem::EdgeItem(Node* a, Node* b, const ChannelProperties& props)
 {
     QPen pen(Qt::white, 2);
 
-    if (mode == ChannelMode::Satellite)
+    if (props.mode == ChannelMode::Satellite)
         pen.setStyle(Qt::DashLine);
     else
         pen.setStyle(Qt::SolidLine);
 
-    setToolTip(QString("Weight: %1\nType: %2\nMode: %3\nError prob: %4")
+    setPen(pen);
+    setZValue(-1);
+    setToolTip(QString("Weight: %1\nType: %2\nMode: %3\nErrProb: %4")
                    .arg(props.weight)
                    .arg(props.type == ChannelType::Duplex ? "Duplex" : "Half-Duplex")
                    .arg(props.mode == ChannelMode::Satellite ? "Satellite" : "Normal")
                    .arg(props.errorProb, 0, 'f', 3));
-
-
-
-    setPen(pen);
-    setZValue(-1);
-    if (!active) {
-        QPen p = this->pen();
-        p.setColor(Qt::gray);
-        p.setStyle(Qt::DashDotLine);
-        setPen(p);
-    }
 
     updatePosition();
 }
@@ -56,18 +47,19 @@ void EdgeItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
         QPen p = pen();
         if (active) {
             p.setColor(Qt::white);
-            p.setStyle(mode == ChannelMode::Satellite ? Qt::DashLine : Qt::SolidLine);
+            p.setStyle(props.mode == ChannelMode::Satellite ? Qt::DashLine : Qt::SolidLine);
         } else {
             p.setColor(Qt::gray);
             p.setStyle(Qt::DashDotLine);
         }
         setPen(p);
 
-        setToolTip(QString("Weight: %1\nType: %2\nMode: %3\nState: %4")
-                       .arg(weight)
-                       .arg(type == ChannelType::Duplex ? "Duplex" : "Half-Duplex")
-                       .arg(mode == ChannelMode::Satellite ? "Satellite" : "Normal")
-                       .arg(active ? "Active" : "Disabled"));
+        setToolTip(QString("Weight: %1\nType: %2\nMode: %3\nState: %4\nErrProb: %5")
+                       .arg(props.weight)
+                       .arg(props.type == ChannelType::Duplex ? "Duplex" : "Half-Duplex")
+                       .arg(props.mode == ChannelMode::Satellite ? "Satellite" : "Normal")
+                       .arg(active ? "Active" : "Disabled")
+                       .arg(props.errorProb, 0, 'f', 3));
 
         emit channelStateChanged();
     }

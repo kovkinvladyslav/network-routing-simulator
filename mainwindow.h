@@ -6,6 +6,7 @@
 #include "graph.h"
 #include "nodeselector.h"
 #include "edgecontroller.h"
+#include "djkstrastepper.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -35,12 +36,21 @@ private slots:
 
     void on_actionArrange_Graph_triggered();
 
+    void on_actionRouting_Next_triggered();
+
+    void on_actionRouting_Start_triggered();
+
+    void on_actionRouting_Reset_triggered();
+
 private:
     Ui::MainWindow *ui;
     Graph* graph;
     NodeSelector* selector;
     EdgeController* edgeController;
     Node* currentNode = nullptr;
+    DijkstraStepper* stepper = nullptr;
+    Node* routingSource = nullptr;
+    RouteMetric currentMetric = RouteMetric::EffectiveCost;
 
     void updateInspector(Node* node);
     void resetInspector();
