@@ -172,14 +172,30 @@ void MainWindow::onNodeSelected(Node* node)
 
 void MainWindow::on_NodeON_toggled(bool checked)
 {
-    if (currentNode && checked)
+    if (currentNode && checked) {
         currentNode->setState(NodeState::ON);
+
+        if (graph->lsrStarted && !graph->lsrComplete)
+            updateTopologyDB(currentNode);
+        else
+            updateRouting();
+
+        updateHighlight();
+    }
 }
 
 void MainWindow::on_NodeOFF_toggled(bool checked)
 {
-    if (currentNode && checked)
+    if (currentNode && checked) {
         currentNode->setState(NodeState::OFF);
+
+        if (graph->lsrStarted && !graph->lsrComplete)
+            updateTopologyDB(currentNode);
+        else
+            updateRouting();
+
+        updateHighlight();
+    }
 }
 
 void MainWindow::updateRouting()
@@ -193,15 +209,18 @@ void MainWindow::updateRouting()
     QStandardItemModel* m = new QStandardItemModel(table.size(), 4, this);
     m->setHorizontalHeaderLabels({"Destination", "Next Hop", "Cost", "Hops"});
 
+    std::vector<std::pair<Node*, RouteEntry>> vec(table.begin(), table.end());
+    std::sort(vec.begin(), vec.end(),
+              [](auto& a, auto& b){ return a.first->getId() < b.first->getId(); });
+
     int row = 0;
-    for (auto& [dst, entry] : table) {
+    for (auto& [dst, entry] : vec) {
         m->setItem(row, 0, new QStandardItem(QString::number(dst->getId())));
         m->setItem(row, 1, new QStandardItem(entry.nextHop ? QString::number(entry.nextHop->getId()) : "-"));
         m->setItem(row, 2, new QStandardItem(QString::number(entry.cost, 'f', 2)));
         m->setItem(row, 3, new QStandardItem(QString::number(entry.hops)));
         row++;
     }
-
     ui->tableView->setModel(m);
 }
 
@@ -426,8 +445,17 @@ void MainWindow::updateHighlight()
 
 void MainWindow::on_actionSend_Message_triggered()
 {
+    auto selected = ui->graphicsView->scene()->selectedItems();
     SendMessage dlg(graph->getAllNodes(), this);
-    if (dlg.exec() != QDialog::Accepted) return;
+
+    if (selected.size() == 2) {
+        Node* a = qgraphicsitem_cast<Node*>(selected[0]);
+        Node* b = qgraphicsitem_cast<Node*>(selected[1]);
+        dlg.presetNodes(a, b);
+    }
+
+    if (dlg.exec() != QDialog::Accepted)
+        return;
 
     Node* src = dlg.getSource();
     Node* dst = dlg.getDestination();
@@ -449,8 +477,8 @@ void MainWindow::on_actionSend_Message_triggered()
                                  .arg(datagram ? "Datagram" : "Virtual Circuit")
                                  .arg(res.totalTime, 0, 'f', 2)
                                  .arg(res.totalPackets)
-                                 .arg(res.retransmissions)
-                             );
+                                 .arg(res.retransmissions));
 }
+
 
 

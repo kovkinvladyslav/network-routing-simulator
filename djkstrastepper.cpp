@@ -43,6 +43,11 @@ bool DijkstraStepper::step(DijkstraStep& out)
     out.settled = u;
 
     for (auto& [nbr, props] : u->get_adj()) {
+        if (nbr->getState() != NodeState::ON)
+            continue;
+        if (u->getState() != NodeState::ON)
+            continue;
+
         double cost = graph->edgeCost(props, metric);
         if (dist[u] + cost < dist[nbr]) {
             dist[nbr] = dist[u] + cost;

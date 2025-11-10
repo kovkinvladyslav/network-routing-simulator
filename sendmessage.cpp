@@ -92,3 +92,12 @@ void SendMessage::accept()
     QDialog::accept();
 }
 
+void SendMessage::presetNodes(Node* a, Node* b)
+{
+    if (a)
+        ui->SourceNode->setCurrentIndex(ui->SourceNode->findText(QString::number(a->getId())));
+    if (b)
+        ui->comboNodeB->setCurrentIndex(ui->comboNodeB->findText(QString::number(b->getId())));
+}
+
+

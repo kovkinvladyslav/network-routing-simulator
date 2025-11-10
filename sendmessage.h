@@ -23,6 +23,7 @@ public:
     int getPacketSizeBytes() const;
     bool isDatagramMode() const;
     void accept();
+    void presetNodes(Node* a, Node* b);
 
 private:
     Ui::SendMessage *ui;

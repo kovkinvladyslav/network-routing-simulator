@@ -203,6 +203,9 @@ RouteTable Graph::computeRoutingFrom(Node* src, RouteMetric metric)
         q.erase(std::remove(q.begin(), q.end(), u), q.end());
 
         for (auto& [nbr, props] : u->get_adj()) {
+            if (u->getState() != NodeState::ON || nbr->getState() != NodeState::ON)
+                continue;
+
             double cost = edgeCost(props, metric);
             if (dist[u] + cost < dist[nbr]) {
                 dist[nbr] = dist[u] + cost;
