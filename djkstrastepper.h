@@ -19,6 +19,7 @@ public:
     DijkstraStepper(Graph* g, Node* src, RouteMetric metric);
     bool step(DijkstraStep& out);
     bool finished() const;
+    std::vector<Node*> getPathTo(Node *dst);
 
 private:
     Graph* graph;

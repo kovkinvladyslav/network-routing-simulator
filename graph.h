@@ -26,9 +26,15 @@ public:
 
     RouteTable computeRoutingFrom(Node* src, RouteMetric metric);
     std::vector<Node*> shortestPath(Node* src, Node* dst, RouteMetric metric);
-
+    void invalidateLSR();
+    bool performLSAStep();
+    void LSRInit();
+    bool lsrStarted = false;
+    bool lsrComplete = false;
+    std::vector<Node*> getShortestPath(Node* src, Node* dst, RouteMetric metric);
 
 private:
+    void forEachActiveLink(std::function<void(Node*, Node*, const ChannelProperties&)> fn);
 
     QGraphicsScene* scene;
     std::vector<std::unique_ptr<Node>> nodes;

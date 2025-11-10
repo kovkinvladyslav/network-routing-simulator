@@ -21,6 +21,7 @@ public:
     void watchNode(Node* node);
     void highlightPath(const std::vector<Node*>& path);
     void highlightRelaxations(const std::vector<std::pair<Node*,Node*>>& relaxEdges);
+    void highlightKnownFor(Node *r);
     void clearHighlight();
 
 signals:

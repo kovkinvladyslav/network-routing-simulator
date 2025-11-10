@@ -7,6 +7,7 @@
 #include <QDir>
 #include <QMessageBox>
 #include <QCoreApplication>
+#include "djkstrastepper.h"
 
 
 Graph::Graph(QGraphicsScene *scene)
@@ -254,5 +255,80 @@ std::vector<Node*> Graph::shortestPath(Node* src, Node* dst, RouteMetric metric)
     std::reverse(path.begin(), path.end());
     return path;
 }
+
+void Graph::invalidateLSR()
+{
+    lsrComplete = false;
+    lsrStarted = false;
+    forEachActiveLink([&](Node *r, Node *, const ChannelProperties&) {
+        r->topologyTable.clear();
+    });
+}
+
+
+bool Graph::performLSAStep() {
+    bool changed = false;
+    std::unordered_map<Node*, LSATable> tempDB;
+
+    for(auto &np : nodes) {
+        tempDB[np.get()] = np->topologyTable;
+    }
+
+    forEachActiveLink([&](Node *r, Node *nbr, const ChannelProperties&) {
+        for(auto &entry : r->topologyTable) {
+            changed |= tempDB[nbr].insert(entry).second;
+        }
+    });
+
+    if(!changed) {
+        lsrComplete = true;
+        return false;
+    }
+
+    for(auto &np : nodes) {
+        Node *r = np.get();
+        if(r->getState() == NodeState::ON) {
+            r->topologyTable = std::move(tempDB[r]);
+        }
+    }
+    return true;
+}
+
+void Graph::LSRInit()
+{
+    lsrStarted = true;
+    lsrComplete = false;
+
+    forEachActiveLink([&](Node *r, Node *nbr, const ChannelProperties &props) {
+        r->topologyTable.insert(TopologyEntry(r, nbr, props));
+    });
+}
+
+std::vector<Node *> Graph::getShortestPath(Node *src, Node *dst, RouteMetric metric)
+{
+    DijkstraStepper stepper(this, src, metric);
+    DijkstraStep tmp;
+
+    while(stepper.step(tmp)){}
+    return stepper.getPathTo(dst);
+}
+
+void Graph::forEachActiveLink(std::function<void (Node *, Node *, const ChannelProperties &)> fn)
+{
+    for(auto &np : nodes) {
+        Node *r = np.get();
+        if(r->getState() != NodeState::ON) {
+            continue;
+        }
+        for(auto &[nbr, props] : r->get_adj()) {
+            if(nbr->getState() != NodeState::ON) {
+                continue;
+            }
+            fn(r, nbr, props);
+        }
+    }
+}
+
+
 
 

@@ -9,6 +9,9 @@
 #include <QStandardItem>
 #include <QGraphicsScene>
 #include <math.h>
+#include "messagesimulator.h"
+#include "sendmessage.h"
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -130,11 +133,11 @@ void MainWindow::on_actionDelete_Connection_triggered()
 void MainWindow::onNodeSelected(Node* node)
 {
     currentNode = node;
-    ui->label->setText(QString("Node %1").arg(node->getId()));
+    ui->labelTableTitle->setText(QString("Node %1").arg(node->getId()));
 
     ui->NodeON->blockSignals(true);
     ui->NodeOFF->blockSignals(true);
-
+    ui->routerId->setNum(node->getId());
     bool hasConnections = !node->get_adj().empty();
 
     if (!hasConnections) {
@@ -159,7 +162,12 @@ void MainWindow::onNodeSelected(Node* node)
     ui->NodeON->blockSignals(false);
     ui->NodeOFF->blockSignals(false);
 
-    updateRouting();
+    if (graph->lsrStarted && !graph->lsrComplete)
+        updateTopologyDB(node);
+    else
+        updateRouting();
+
+    updateHighlight();
 }
 
 void MainWindow::on_NodeON_toggled(bool checked)
@@ -177,6 +185,8 @@ void MainWindow::on_NodeOFF_toggled(bool checked)
 void MainWindow::updateRouting()
 {
     if (!currentNode) return;
+
+    ui->labelTableTitle->setText("Routing Table (SPF Result)");
 
     auto table = graph->computeRoutingFrom(currentNode, currentMetric);
 
@@ -227,7 +237,7 @@ void MainWindow::on_actionDelete_Node_triggered()
     }
 
     currentNode = nullptr;
-    ui->label->setText("No node selected");
+    ui->labelTableTitle->setText("No node selected");
     ui->NodeON->setChecked(false);
     ui->NodeOFF->setChecked(false);
     ui->NodeON->setEnabled(false);
@@ -298,7 +308,6 @@ void MainWindow::on_actionArrange_Graph_triggered()
     graph->applyForceDirectedLayout();
 }
 
-
 void MainWindow::on_actionRouting_Next_triggered()
 {
     if (!stepper || stepper->finished()) return;
@@ -313,7 +322,6 @@ void MainWindow::on_actionRouting_Next_triggered()
 
 }
 
-
 void MainWindow::on_actionRouting_Start_triggered()
 {
     if (!currentNode) return;
@@ -326,9 +334,123 @@ void MainWindow::on_actionRouting_Start_triggered()
     QMessageBox::information(this, "SPF", "Djkstra started from selected node.");
 }
 
+void MainWindow::updateTopologyDB(Node* r) {
+    if (!r) return;
+
+    ui->labelTableTitle->setText("Topology DB (LSR Phase)");
+
+    auto& db = r->topologyTable;
+
+    QStandardItemModel* m = new QStandardItemModel(this);
+    m->setHorizontalHeaderLabels({"Router", "Neighbor", "Cost"});
+
+    for(auto &entr : db) {
+        QList<QStandardItem*> row;
+        row << new QStandardItem(QString::number(entr.from->getId()));
+        row << new QStandardItem(QString::number(entr.to->getId()));
+        row << new QStandardItem(QString::number(entr.props.weight));
+        m->appendRow(row);
+    }
+
+    ui->tableView->setModel(m);
+
+    updateHighlight();
+}
 
 void MainWindow::on_actionRouting_Reset_triggered()
 {
     edgeController->clearHighlight();
 }
+
+
+void MainWindow::on_actionLSR_Run_triggered()
+{
+    if(!graph->lsrStarted || graph->lsrComplete){
+        graph->LSRInit();
+    }
+    while(graph->performLSAStep()) {}
+    QMessageBox::information(this, "LSR", "LSR Completed. All routers now share the same topology database.");
+
+    if (currentNode)
+        updateTopologyDB(currentNode);
+    updateHighlight();
+
+}
+
+void MainWindow::on_actionLSR_Start_triggered()
+{
+    if (graph->lsrStarted && !graph->lsrComplete) {
+        QMessageBox::warning(this, "LSR", "Already running.");
+        return;
+    } else if (graph->lsrComplete) {
+        graph->invalidateLSR();
+    }
+
+    graph->LSRInit();
+    updateTopologyDB(currentNode);
+    updateHighlight();
+}
+
+void MainWindow::on_actionLSR_Next_Step_triggered()
+{
+    if (!graph->lsrStarted || graph->lsrComplete) return;
+
+    if (graph->performLSAStep()) {
+        updateTopologyDB(currentNode);
+    } else {
+        QMessageBox::information(this, "LSR", "Topology synchronized.");
+    }
+    updateHighlight();
+}
+
+void MainWindow::on_actionLSR_Reset_2_triggered()
+{
+    graph->invalidateLSR();
+    updateTopologyDB(currentNode);
+    updateHighlight();
+}
+
+void MainWindow::updateHighlight()
+{
+    if (!currentNode) {
+        edgeController->clearHighlight();
+        return;
+    }
+
+    if (graph->lsrStarted && !graph->lsrComplete) {
+        edgeController->highlightKnownFor(currentNode);
+    } else {
+        edgeController->clearHighlight();
+    }
+}
+
+void MainWindow::on_actionSend_Message_triggered()
+{
+    SendMessage dlg(graph->getAllNodes(), this);
+    if (dlg.exec() != QDialog::Accepted) return;
+
+    Node* src = dlg.getSource();
+    Node* dst = dlg.getDestination();
+    int msgSize = dlg.getMessageSizeBytes();
+    int pkt = dlg.getPacketSizeBytes();
+    bool datagram = dlg.isDatagramMode();
+
+    MessageSimulationResult res = datagram
+                                      ? MessageSimulator::sendDatagram(graph, src, dst, msgSize, pkt)
+                                      : MessageSimulator::sendVirtualCircuit(graph, src, dst, msgSize, pkt);
+
+    if (res.lastPath.size() >= 2)
+        edgeController->highlightPath(res.lastPath);
+    else
+        edgeController->clearHighlight();
+
+    QMessageBox::information(this, "Simulation Result",
+                             QString("Mode: %1\nTotal time: %2 ms\nPackets: %3\nRetransmissions: %4")
+                                 .arg(datagram ? "Datagram" : "Virtual Circuit")
+                                 .arg(res.totalTime, 0, 'f', 2)
+                                 .arg(res.totalPackets)
+                                 .arg(res.retransmissions)
+                             );
+}
+
 

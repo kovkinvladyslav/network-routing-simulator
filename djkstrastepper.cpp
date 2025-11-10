@@ -14,6 +14,20 @@ DijkstraStepper::DijkstraStepper(Graph* g, Node* src, RouteMetric metric)
 
 bool DijkstraStepper::finished() const { return done; }
 
+std::vector<Node*> DijkstraStepper::getPathTo(Node* dst) {
+    std::vector<Node*> path;
+    if (!parent.count(dst) && dst != source) return path;
+
+    Node* cur = dst;
+    while (cur != source) {
+        path.push_back(cur);
+        cur = parent.at(cur);
+    }
+    path.push_back(source);
+    std::reverse(path.begin(), path.end());
+    return path;
+}
+
 bool DijkstraStepper::step(DijkstraStep& out)
 {
     if (done) return false;

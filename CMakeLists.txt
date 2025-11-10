@@ -36,6 +36,10 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ChannelProperties.h
         routetypes.h
         djkstrastepper.h djkstrastepper.cpp
+        topologyentry.h topologyentry.cpp
+        sendmessage.ui
+        sendmessage.h sendmessage.cpp
+        messagesimulator.h messagesimulator.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET kpsrc APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

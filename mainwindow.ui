@@ -74,6 +74,7 @@
     <addaction name="actionShow_All"/>
     <addaction name="actionGenerate_topology"/>
     <addaction name="actionArrange_Graph"/>
+    <addaction name="actionSend_Message"/>
    </widget>
    <widget class="QMenu" name="menuRouting">
     <property name="title">
@@ -84,8 +85,18 @@
     <addaction name="actionRouting_Start"/>
     <addaction name="actionRouting_Reset"/>
    </widget>
+   <widget class="QMenu" name="menuStart">
+    <property name="title">
+     <string>LSR</string>
+    </property>
+    <addaction name="actionLSR_Start"/>
+    <addaction name="actionLSR_Next_Step"/>
+    <addaction name="actionLSR_Run"/>
+    <addaction name="actionLSR_Reset_2"/>
+   </widget>
    <addaction name="menuNode"/>
    <addaction name="menuRouting"/>
+   <addaction name="menuStart"/>
   </widget>
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
@@ -103,6 +114,7 @@
    <addaction name="actionAddConnection"/>
    <addaction name="actionDelete_Connection"/>
    <addaction name="actionDelete_Node"/>
+   <addaction name="actionSend_Message"/>
   </widget>
   <widget class="QDockWidget" name="dockWidget">
    <property name="enabled">
@@ -114,10 +126,23 @@
    <widget class="QWidget" name="nodeInspectorDock">
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>Node ID</string>
-       </property>
+      <widget class="QWidget" name="widget" native="true">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Router ID</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="routerId">
+          <property name="text">
+           <string>Router</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </item>
      <item>
@@ -141,6 +166,13 @@
         </layout>
        </item>
       </layout>
+     </item>
+     <item>
+      <widget class="QLabel" name="labelTableTitle">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QTableView" name="tableView"/>
@@ -249,6 +281,36 @@
   <action name="actionRouting_Reset">
    <property name="text">
     <string>Reset Highlight</string>
+   </property>
+  </action>
+  <action name="actionLSR_Next_Step">
+   <property name="text">
+    <string>LSR Next Step</string>
+   </property>
+  </action>
+  <action name="actionLSR_Reset">
+   <property name="text">
+    <string>LSR Reset</string>
+   </property>
+  </action>
+  <action name="actionLSR_Start">
+   <property name="text">
+    <string>LSR Start</string>
+   </property>
+  </action>
+  <action name="actionLSR_Run">
+   <property name="text">
+    <string>LSR Run</string>
+   </property>
+  </action>
+  <action name="actionLSR_Reset_2">
+   <property name="text">
+    <string>LSR Reset</string>
+   </property>
+  </action>
+  <action name="actionSend_Message">
+   <property name="text">
+    <string>Send Message</string>
    </property>
   </action>
  </widget>

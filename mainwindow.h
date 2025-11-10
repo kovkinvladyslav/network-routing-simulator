@@ -31,7 +31,6 @@ private slots:
     void on_NodeOFF_toggled(bool checked);
     void updateRouting();
 
-
     void on_actionGenerate_topology_triggered();
 
     void on_actionArrange_Graph_triggered();
@@ -42,6 +41,17 @@ private slots:
 
     void on_actionRouting_Reset_triggered();
 
+    void on_actionLSR_Run_triggered();
+
+    void on_actionLSR_Start_triggered();
+
+
+    void on_actionLSR_Next_Step_triggered();
+
+    void on_actionLSR_Reset_2_triggered();
+
+    void on_actionSend_Message_triggered();
+
 private:
     Ui::MainWindow *ui;
     Graph* graph;
@@ -51,12 +61,16 @@ private:
     DijkstraStepper* stepper = nullptr;
     Node* routingSource = nullptr;
     RouteMetric currentMetric = RouteMetric::EffectiveCost;
-
+    void updateLSRControls();
     void updateInspector(Node* node);
     void resetInspector();
     void removeEdgeBetween(Node* a, Node* b);
     void removeAllEdges(Node* node);
     QVector<Node*> selectedNodes() const;
+    void updateTopologyDB(Node* r);
+    void updateHighlight();
+
+
 };
 
 #endif // MAINWINDOW_H

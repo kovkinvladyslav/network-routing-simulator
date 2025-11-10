@@ -92,4 +92,19 @@ void EdgeController::highlightRelaxations(const std::vector<std::pair<Node*,Node
     }
 }
 
+void EdgeController::highlightKnownFor(Node *r)
+{
+    clearHighlight();
+    if (!r) return;
+
+    for (const auto& eInfo : r->topologyTable) {
+        if (auto e = findEdge(eInfo.from, eInfo.to)) {
+            QPen p = e->pen();
+            p.setWidth(4);
+            p.setColor(Qt::yellow);
+            e->setPen(p);
+        }
+    }
+}
+
 

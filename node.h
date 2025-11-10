@@ -6,12 +6,18 @@
 #include <QPointF>
 #include <QObject>
 #include "edgeitem.h"
+#include <set>
+#include "topologyentry.h"
 
 enum class NodeState {
     ON,
     OFF,
     DISCONNECTED
 };
+
+
+using LSATable = std::set<TopologyEntry>;
+
 
 class Node : public QObject, public QGraphicsEllipseItem
 {
@@ -25,6 +31,8 @@ public:
     void highlight(bool on);
     void removeAdj(Node* other);
     const NodeState getState() const;
+    LSATable topologyTable;
+
 signals:
     void clicked(Node* self);
     void moved();
