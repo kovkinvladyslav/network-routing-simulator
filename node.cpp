@@ -83,6 +83,13 @@ const NodeState Node::getState() const
     return state;
 }
 
+void Node::updateChannelProperty(Node* neighbor, const ChannelProperties& newProps)
+{
+    if (adj_nodes.count(neighbor)) {
+        adj_nodes[neighbor] = newProps;
+    }
+}
+
 void Node::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     emit clicked(this);

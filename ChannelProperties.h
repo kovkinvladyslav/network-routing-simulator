@@ -5,9 +5,9 @@ enum class ChannelType { Duplex, HalfDuplex };
 enum class ChannelMode { Normal, Satellite };
 
 struct ChannelProperties {
-    int weight;
-    ChannelType type;
-    ChannelMode mode;
+    int weight = 1;
+    ChannelType type = ChannelType::Duplex;
+    ChannelMode mode = ChannelMode::Normal;
     bool active = true;
     double errorProb = 0.1;
 };

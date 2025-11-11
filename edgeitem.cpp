@@ -44,6 +44,10 @@ void EdgeItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
     if (chosen == toggle) {
         active = !active;
 
+        props.active = active;
+        a->updateChannelProperty(b, props);
+        b->updateChannelProperty(a, props);
+
         QPen p = pen();
         if (active) {
             p.setColor(Qt::white);

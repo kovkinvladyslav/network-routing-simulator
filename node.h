@@ -32,7 +32,7 @@ public:
     void removeAdj(Node* other);
     const NodeState getState() const;
     LSATable topologyTable;
-
+    void updateChannelProperty(Node* neighbor, const ChannelProperties& newProps);
 signals:
     void clicked(Node* self);
     void moved();

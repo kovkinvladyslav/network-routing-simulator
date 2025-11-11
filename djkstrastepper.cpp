@@ -48,6 +48,9 @@ bool DijkstraStepper::step(DijkstraStep& out)
         if (u->getState() != NodeState::ON)
             continue;
 
+        if (!props.active)
+            continue;
+
         double cost = graph->edgeCost(props, metric);
         if (dist[u] + cost < dist[nbr]) {
             dist[nbr] = dist[u] + cost;

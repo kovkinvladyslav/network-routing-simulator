@@ -42,13 +42,20 @@ constexpr double SATELLITE_LATENCY = 0.25;
 
 double Graph::computeTransmissionTime(const ChannelProperties &ch, int packetBytes)
 {
-    double t = (packetBytes / 100.0) * ch.weight;
+    // 1) Час передачі (прямо від ваги каналу)
+    double transmission = (double)packetBytes * ch.weight * 0.001;
+    // 0.001 задає масштаб — щоб 1000 байт з вагою 10 давали ~10 мс
 
+    // 2) Затримка поширення
+    double propagation = ch.mode == ChannelMode::Satellite ?
+                            SATELLITE_LATENCY:
+                            0.01;
+
+    double t = transmission + propagation;
+
+    // 3) Напівдуплекс подвоює час
     if (ch.type == ChannelType::HalfDuplex)
-        t *= 2;
-
-    if (ch.mode == ChannelMode::Satellite)
-        t += SATELLITE_LATENCY;
+        t *= 2.0;
 
     return t;
 }
@@ -162,12 +169,9 @@ void Graph::removeNode(Node* node)
 double Graph::edgeCost(const ChannelProperties& p, RouteMetric metric) const {
     if (metric == RouteMetric::MinHops)
         return 1.0;
+    int ref_bw = 1000;
 
-    double type_factor = (p.type == ChannelType::Duplex ? 1.0 : 1.2);
-    double mode_factor = (p.mode == ChannelMode::Satellite ? 1.5 : 1.0);
-    double retry_factor = 1.0 / (1.0 - p.errorProb);
-
-    return p.weight * type_factor * mode_factor * retry_factor;
+    return ref_bw / p.weight + (p.mode == ChannelMode::Satellite ? 250 : 0);
 }
 
 RouteTable Graph::computeRoutingFrom(Node* src, RouteMetric metric)
@@ -204,6 +208,9 @@ RouteTable Graph::computeRoutingFrom(Node* src, RouteMetric metric)
 
         for (auto& [nbr, props] : u->get_adj()) {
             if (u->getState() != NodeState::ON || nbr->getState() != NodeState::ON)
+                continue;
+
+            if (!props.active)
                 continue;
 
             double cost = edgeCost(props, metric);
