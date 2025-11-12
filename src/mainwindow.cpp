@@ -266,20 +266,40 @@ void MainWindow::on_actionDelete_Node_triggered()
 
 void MainWindow::on_actionGenerate_topology_triggered()
 {
-    delete edgeController;
-    delete graph;
-    ui->graphicsView->scene()->clear();
+    constexpr int NODE_COUNT = 24;
+    constexpr int AVERAGE_DEGREE = 4;
+    constexpr int SATELLITE_CHANNELS = 2;
+    const int TARGET_EDGES = (NODE_COUNT * AVERAGE_DEGREE) / 2;
 
-    graph = new Graph(ui->graphicsView->scene());
-    edgeController = new EdgeController(ui->graphicsView->scene(), graph);
+    // 🔁 1. full reset
+    if (stepper) { delete stepper; stepper = nullptr; }
+    if (edgeController) { delete edgeController; edgeController = nullptr; }
+    if (graph) { delete graph; graph = nullptr; }
+    if (selector) { delete selector; selector = nullptr; }
 
-    const int nodeCount = 24;
+    // 2. create new scene
+    QGraphicsScene* scene = new QGraphicsScene(this);
+    ui->graphicsView->setScene(scene);
+    scene->setSceneRect(0, 0, 800, 600);
+
+    // 3. recreate graph, selector, and edge controller
+    graph = new Graph(scene);
+    selector = new NodeSelector(scene);
+    edgeController = new EdgeController(scene, graph);
+
+    // reconnect all signals
+    connect(edgeController, &EdgeController::routingChanged,
+            this, &MainWindow::updateRouting);
+    connect(selector, &NodeSelector::oneNodeSelected,
+            this, &MainWindow::onNodeSelected);
+
+    // 4. create nodes
     std::vector<Node*> nodes;
+    nodes.reserve(NODE_COUNT);
 
-    for (int i = 0; i < nodeCount; ++i) {
-        double angle = (2 * M_PI * i) / nodeCount;
-        double centerX = 400, centerY = 300;
-        double radius = 250;
+    const double centerX = 400.0, centerY = 300.0, radius = 250.0;
+    for (int i = 0; i < NODE_COUNT; ++i) {
+        double angle = (2 * M_PI * i) / NODE_COUNT;
         QPointF pos(centerX + radius * std::cos(angle),
                     centerY + radius * std::sin(angle));
         Node* node = graph->add_node(std::make_unique<Node>(i + 1, pos));
@@ -287,40 +307,72 @@ void MainWindow::on_actionGenerate_topology_triggered()
         edgeController->watchNode(node);
     }
 
-    for (int i = 1; i < nodeCount; ++i) {
+    // 5. generate edges
+    int edgeCount = 0;
+    auto randomWeight = []() {
+        return Graph::ALLOWED_RANDOM_WEIGHTS[
+            rand() % Graph::ALLOWED_RANDOM_WEIGHTS.size()];
+    };
+
+    // ensure connected ring
+    for (int i = 1; i < NODE_COUNT; ++i) {
         Node* a = nodes[i];
-        Node* b = nodes[rand() % i];
-        int w = Graph::ALLOWED_RANDOM_WEIGHTS[rand() % Graph::ALLOWED_RANDOM_WEIGHTS.size()];
-        ChannelProperties props{ w, ChannelType::Duplex, ChannelMode::Normal };
+        Node* b = nodes[i - 1];
+        ChannelProperties props{ randomWeight(), ChannelType::Duplex, ChannelMode::Normal };
         graph->connect(a, b, props);
         edgeController->addEdge(a, b, props);
+        edgeCount++;
     }
 
-    for (int k = 0; k < nodeCount / 2; ++k) {
-        Node* a = nodes[rand() % nodeCount];
-        Node* b = nodes[rand() % nodeCount];
+    while (edgeCount < TARGET_EDGES - SATELLITE_CHANNELS) {
+        Node* a = nodes[rand() % NODE_COUNT];
+        Node* b = nodes[rand() % NODE_COUNT];
         if (a == b || edgeController->findEdge(a, b)) continue;
-        int w = Graph::ALLOWED_RANDOM_WEIGHTS[rand() % Graph::ALLOWED_RANDOM_WEIGHTS.size()];
-        ChannelProperties props{ w, ChannelType::Duplex, ChannelMode::Normal };
+        ChannelProperties props{ randomWeight(), ChannelType::Duplex, ChannelMode::Normal };
         graph->connect(a, b, props);
         edgeController->addEdge(a, b, props);
+        edgeCount++;
     }
 
     int sat = 0;
-    while (sat < 2) {
-        Node* a = nodes[rand() % nodeCount];
-        Node* b = nodes[rand() % nodeCount];
+    while (sat < SATELLITE_CHANNELS) {
+        Node* a = nodes[rand() % NODE_COUNT];
+        Node* b = nodes[rand() % NODE_COUNT];
         if (a == b || edgeController->findEdge(a, b)) continue;
-        int w = Graph::ALLOWED_RANDOM_WEIGHTS[rand() % Graph::ALLOWED_RANDOM_WEIGHTS.size()];
-        ChannelProperties props{ w, ChannelType::Duplex, ChannelMode::Satellite };
+        ChannelProperties props{ randomWeight(), ChannelType::Duplex, ChannelMode::Satellite };
         graph->connect(a, b, props);
         edgeController->addEdge(a, b, props);
         sat++;
+        edgeCount++;
     }
 
+    // 6. layout
     graph->applyForceDirectedLayout();
-    QMessageBox::information(this, "Done", "Topology generated according to Variant 10.");
+
+    // 7. reset routing/LSR states
+    graph->invalidateLSR();
+    currentNode = nullptr;
+    currentMetric = RouteMetric::EffectiveCost;
+
+    ui->labelTableTitle->setText("No node selected");
+    ui->NodeON->setChecked(false);
+    ui->NodeOFF->setChecked(false);
+    ui->NodeON->setEnabled(false);
+    ui->NodeOFF->setEnabled(false);
+    ui->tableView->setModel(nullptr);
+
+    // 8. popup info
+    double avgDegree = static_cast<double>(2 * edgeCount) / NODE_COUNT;
+    QMessageBox::information(this, "Topology generated",
+                             QString("Created topology:\n"
+                                     "Nodes: %1\nEdges: %2\n"
+                                     "Average degree: %3\nSatellite channels: %4")
+                                 .arg(NODE_COUNT)
+                                 .arg(edgeCount)
+                                 .arg(avgDegree, 0, 'f', 2)
+                                 .arg(SATELLITE_CHANNELS));
 }
+
 
 void MainWindow::on_actionArrange_Graph_triggered()
 {

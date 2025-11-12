@@ -8,6 +8,11 @@
 #include <QMessageBox>
 #include <QCoreApplication>
 #include "djkstrastepper.h"
+#include <QFile>
+#include <QFileInfo>
+#include <QJsonDocument>
+#include <QStandardPaths>
+#include <QDebug>
 
 
 Graph::Graph(QGraphicsScene *scene)
@@ -42,18 +47,14 @@ constexpr double SATELLITE_LATENCY = 0.25;
 
 double Graph::computeTransmissionTime(const ChannelProperties &ch, int packetBytes)
 {
-    // 1) Час передачі (прямо від ваги каналу)
     double transmission = (double)packetBytes * ch.weight * 0.001;
-    // 0.001 задає масштаб — щоб 1000 байт з вагою 10 давали ~10 мс
 
-    // 2) Затримка поширення
     double propagation = ch.mode == ChannelMode::Satellite ?
                             SATELLITE_LATENCY:
                             0.01;
 
     double t = transmission + propagation;
 
-    // 3) Напівдуплекс подвоює час
     if (ch.type == ChannelType::HalfDuplex)
         t *= 2.0;
 
@@ -70,26 +71,54 @@ void Graph::removeConnection(Node* a, Node* b)
 
 void Graph::applyForceDirectedLayout()
 {
-    if (nodes.size() < 2) return;
+    if (nodes.empty()) return;
 
-    QString base = QCoreApplication::applicationDirPath() + "/../..";
-    QString python = base + "/venv/Scripts/python.exe";
-    QString script = base + "/layout.py";
+    auto doFallbackRadial = [this]() {
+        const double CX = 500.0, CY = 350.0, R = 300.0;
+        const int n = static_cast<int>(nodes.size());
+        for (int i = 0; i < n; ++i) {
+            const double ang = (2.0 * M_PI * i) / n;
+            nodes[i]->setPos(CX + R * std::cos(ang), CY + R * std::sin(ang));
+        }
+        qWarning() << "[layout] Fallback radial applied.";
+    };
 
-    if (!QFile::exists(python) || !QFile::exists(script))
+    const QString appDir = QCoreApplication::applicationDirPath();
+
+#ifdef Q_OS_WIN
+    const QString python = QDir(appDir).filePath("../../src/venv/Scripts/python.exe");
+#else
+    const QString python = QDir(appDir).filePath("../../src/venv/bin/python3");
+#endif
+    const QString script = QDir(appDir).filePath("../../src/layout.py");
+
+    qDebug() << "[layout] checking paths:" << python << script;
+    qDebug() << "[layout] appDir =" << appDir;
+    qDebug() << "[layout] absolute python path =" << QDir(python).absolutePath();
+    qDebug() << "[layout] absolute script path =" << QDir(script).absolutePath();
+
+    if (!QFile::exists(python) || !QFile::exists(script)) {
+        qWarning() << "[layout] python or layout.py missing:" << python << script;
+        doFallbackRadial();
         return;
+    }
 
     QJsonObject root;
-    root["node_count"] = int(nodes.size());
-
-    std::unordered_map<Node*, int> index;
-    for (int i = 0; i < (int)nodes.size(); ++i)
-        index[nodes[i].get()] = i;
+    root.insert("node_count", static_cast<int>(nodes.size()));
 
     QJsonArray edgesArr;
-    for (int i = 0; i < (int)nodes.size(); ++i)
-        for (auto &[nbr, props] : nodes[i]->get_adj()) {
-            int j = index[nbr];
+    std::unordered_map<Node*, int> index;
+    index.reserve(nodes.size());
+    for (int i = 0; i < static_cast<int>(nodes.size()); ++i)
+        index[nodes[i].get()] = i;
+
+    for (int i = 0; i < static_cast<int>(nodes.size()); ++i) {
+        Node* a = nodes[i].get();
+        for (auto &[b, props] : a->get_adj()) {
+            if (!b) continue;
+            auto it = index.find(b);
+            if (it == index.end()) continue;
+            int j = it->second;
             if (i < j) {
                 QJsonArray e;
                 e.append(i);
@@ -98,51 +127,67 @@ void Graph::applyForceDirectedLayout()
                 edgesArr.append(e);
             }
         }
+    }
 
-    root["edges"] = edgesArr;
+    root.insert("edges", edgesArr);
     QByteArray inputJson = QJsonDocument(root).toJson(QJsonDocument::Compact);
 
-    QProcess *p = new QProcess();
-    p->setProgram(python);
-    p->setArguments({ script });
+    if (edgesArr.isEmpty()) {
+        qWarning() << "[layout] No edges to layout.";
+        doFallbackRadial();
+        return;
+    }
 
-    QObject::connect(p, &QProcess::started, [p, inputJson]() {
-        p->write(inputJson);
-        p->closeWriteChannel();
-    });
+    QProcess proc;
+    proc.setProgram(python);
+    proc.setArguments({script});
+    proc.setWorkingDirectory(QFileInfo(script).absolutePath());
 
-    QObject::connect(p, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
-                     [this, p](int, QProcess::ExitStatus) {
+    qDebug() << "[layout] launching python:" << python;
+    qDebug() << "[layout] layout.py:" << script;
 
-                         QByteArray out = p->readAllStandardOutput();
-                         QByteArray err = p->readAllStandardError();
+    proc.start();
+    if (!proc.waitForStarted(3000)) {
+        qWarning() << "[layout] Failed to start Python:" << proc.errorString();
+        doFallbackRadial();
+        return;
+    }
 
-                         if (!err.isEmpty())
-                             qDebug() << "[PYTHON STDERR]" << err;
+    proc.write(inputJson);
+    proc.closeWriteChannel();
 
-                         QJsonParseError parseErr{};
-                         QJsonDocument parsed = QJsonDocument::fromJson(out, &parseErr);
-                         if (parseErr.error != QJsonParseError::NoError) {
-                             qDebug() << "JSON parse error:" << parseErr.errorString();
-                             p->deleteLater();
-                             return;
-                         }
+    if (!proc.waitForFinished(10000)) {
+        qWarning() << "[layout] Python timeout.";
+        proc.kill();
+        doFallbackRadial();
+        return;
+    }
 
-                         QJsonObject pos = parsed.object();
+    QByteArray out = proc.readAllStandardOutput();
+    QByteArray err = proc.readAllStandardError();
 
-                         for (int i = 0; i < (int)nodes.size(); ++i) {
-                             QJsonArray arr = pos[QString::number(i)].toArray();
-                             if (arr.size() < 2) continue;
-                             double x = arr[0].toDouble() * 600 + 400;
-                             double y = arr[1].toDouble() * 600 + 300;
-                             nodes[i]->setPos(x, y);
-                         }
+    if (!err.isEmpty())
+        qWarning() << "[layout][stderr]" << err;
 
-                         qDebug() << "Layout applied successfully (finished event).";
-                         p->deleteLater();
-                     });
+    QJsonParseError perr{};
+    QJsonDocument parsed = QJsonDocument::fromJson(out, &perr);
 
-    p->start();
+    if (perr.error != QJsonParseError::NoError || !parsed.isObject()) {
+        qWarning() << "[layout] Invalid JSON output from layout.py:" << perr.errorString();
+        doFallbackRadial();
+        return;
+    }
+
+    QJsonObject pos = parsed.object();
+    for (int i = 0; i < static_cast<int>(nodes.size()); ++i) {
+        const QJsonArray arr = pos[QString::number(i)].toArray();
+        if (arr.size() < 2) continue;
+        const double x = arr[0].toDouble() * 600 + 400;
+        const double y = arr[1].toDouble() * 600 + 300;
+        nodes[i]->setPos(x, y);
+    }
+
+    qDebug() << "[layout] Layout applied successfully.";
 }
 
 
