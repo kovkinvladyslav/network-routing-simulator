@@ -146,5 +146,39 @@
 даних, а також досліджені взаємозв'язки між часом передачі і обсягом 
 службової інформації залежно від розміру пакету та повідомлення. 
 Програма була реалізована на мові програмування C++.
-#set align(left)
 
+*Ключові слова*: комп’ютерні мережі; передача даних; маршрутизація; 
+користувач; вузли; логічне з’єднання; віртуальний канал; дейтаграмний режим; 
+аналіз результатів.
+
+#pagebreak()
+#set align(center + top)
+#set par(first-line-indent: 1.25cm)
+ABSTRACT\
+#set align(left)
+The course project includes an explanatory note (40 pages, 28 figures, 5 tables).  
+In this course project, a program was developed to simulate the process of message 
+transmission in a data communication network. The main purpose of the program 
+is to model the process of selecting a route for data transmission within a network 
+of a given configuration. The program can analyze the transmission time of messages, 
+the number of data and service packets.
+
+For convenient interaction with the program, a graphical user interface was developed, 
+allowing users to configure parameters of the data transmission network.  
+The project also contains a theoretical part that presents the fundamental concepts 
+and provides information related to the specific network defined by the assignment.
+
+During the development process, tests were conducted with various data sets, 
+and relationships were studied between transmission time and the amount of 
+service information depending on the size of packets and messages.  
+The program was implemented in the C++ programming language.
+
+*Keywords*: computer networks; data transmission; routing; user; nodes; logical connection; 
+virtual channel; datagram mode; result analysis.
+
+#pagebreak()
+#label("outline-start")
+#let outl = [#align(center)[ЗМІСТ]]
+#import "shtamp.typ" : *
+
+#mypage(outl, "ІАЛЦ. 467200.002 ТЗ")
