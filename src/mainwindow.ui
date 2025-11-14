@@ -48,7 +48,7 @@
    </property>
    <widget class="QMenu" name="menuNode">
     <property name="title">
-     <string>Node</string>
+     <string>Network</string>
     </property>
     <widget class="QMenu" name="menuAdd">
      <property name="title">
@@ -71,7 +71,6 @@
     <addaction name="actionOpen"/>
     <addaction name="actionZoom_In"/>
     <addaction name="actionZoom_Out"/>
-    <addaction name="actionShow_All"/>
     <addaction name="actionGenerate_topology"/>
     <addaction name="actionArrange_Graph"/>
     <addaction name="actionSend_Message"/>
