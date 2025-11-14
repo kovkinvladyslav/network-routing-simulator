@@ -9,18 +9,24 @@ EdgeItem::EdgeItem(Node* a, Node* b, const ChannelProperties& props)
 {
     QPen pen(Qt::white, 2);
 
-    if (props.mode == ChannelMode::Satellite)
-        pen.setStyle(Qt::DashLine);
-    else
-        pen.setStyle(Qt::SolidLine);
+    ChannelProperties freshProps = a->get_adj().at(b);
 
-    setPen(pen);
-    setZValue(-1);
-    setToolTip(QString("Weight: %1\nType: %2\nMode: %3\nErrProb: %4")
-                   .arg(props.weight)
-                   .arg(props.type == ChannelType::Duplex ? "Duplex" : "Half-Duplex")
-                   .arg(props.mode == ChannelMode::Satellite ? "Satellite" : "Normal")
-                   .arg(props.errorProb, 0, 'f', 3));
+    QPen p = this->pen();
+    if (active) {
+        p.setColor(Qt::white);
+        p.setStyle(freshProps.mode == ChannelMode::Satellite ? Qt::DashLine : Qt::SolidLine);
+    } else {
+        p.setColor(Qt::gray);
+        p.setStyle(Qt::DashDotLine);
+    }
+    setPen(p);
+
+    setToolTip(QString("Weight: %1\nType: %2\nMode: %3\nState: %4\nErrProb: %5")
+                   .arg(freshProps.weight)
+                   .arg(freshProps.type == ChannelType::Duplex ? "Duplex" : "Half-Duplex")
+                   .arg(freshProps.mode == ChannelMode::Satellite ? "Satellite" : "Normal")
+                   .arg(active ? "Active" : "Disabled")
+                   .arg(freshProps.errorProb, 0, 'f', 3));
 
     updatePosition();
 }

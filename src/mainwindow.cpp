@@ -541,3 +541,40 @@ void MainWindow::on_actionView_Logs_triggered()
     dlg.exec();
 }
 
+
+void MainWindow::on_actionClear_triggered()
+{
+    if (stepper) { delete stepper; stepper = nullptr; }
+    if (edgeController) { delete edgeController; edgeController = nullptr; }
+    if (graph) { delete graph; graph = nullptr; }
+    if (selector) { delete selector; selector = nullptr; }
+
+    QGraphicsScene* scene = new QGraphicsScene(this);
+    ui->graphicsView->setScene(scene);
+
+    graph = new Graph(scene);
+    selector = new NodeSelector(scene);
+    edgeController = new EdgeController(scene, graph);
+
+    // Підключити сигнали
+    connect(edgeController, &EdgeController::routingChanged,
+            this, &MainWindow::updateRouting);
+    connect(selector, &NodeSelector::oneNodeSelected,
+            this, &MainWindow::onNodeSelected);
+
+    currentNode = nullptr;
+    currentMetric = RouteMetric::EffectiveCost;
+    ui->labelTableTitle->setText("No node selected");
+    ui->NodeON->setChecked(false);
+    ui->NodeOFF->setChecked(false);
+    ui->NodeON->setEnabled(false);
+    ui->NodeOFF->setEnabled(false);
+    ui->tableView->setModel(nullptr);
+
+    messageLog.clear();
+
+    QMessageBox::information(this, "Clear", "Scene cleared.");
+}
+
+
+
