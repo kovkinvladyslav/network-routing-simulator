@@ -544,25 +544,57 @@ void MainWindow::on_actionView_Logs_triggered()
 
 void MainWindow::on_actionClear_triggered()
 {
-    if (stepper) { delete stepper; stepper = nullptr; }
-    if (edgeController) { delete edgeController; edgeController = nullptr; }
-    if (graph) { delete graph; graph = nullptr; }
-    if (selector) { delete selector; selector = nullptr; }
+    if (edgeController) {
+        disconnect(edgeController, &EdgeController::routingChanged,
+                   this, &MainWindow::updateRouting);
+    }
+
+    if (selector) {
+        disconnect(selector, &NodeSelector::oneNodeSelected,
+                   this, &MainWindow::onNodeSelected);
+    }
+
+    currentNode = nullptr;
+
+    if (stepper) {
+        delete stepper;
+        stepper = nullptr;
+    }
+
+    if (edgeController) {
+        delete edgeController;
+        edgeController = nullptr;
+    }
+
+    if (selector) {
+        delete selector;
+        selector = nullptr;
+    }
+
+    QGraphicsScene* oldScene = ui->graphicsView->scene();
+
+    if (graph) {
+        delete graph;
+        graph = nullptr;
+    }
+
+    if (oldScene) {
+        delete oldScene;
+    }
 
     QGraphicsScene* scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
+    scene->setSceneRect(0, 0, 800, 600);
 
     graph = new Graph(scene);
     selector = new NodeSelector(scene);
     edgeController = new EdgeController(scene, graph);
 
-    // Підключити сигнали
     connect(edgeController, &EdgeController::routingChanged,
             this, &MainWindow::updateRouting);
     connect(selector, &NodeSelector::oneNodeSelected,
             this, &MainWindow::onNodeSelected);
 
-    currentNode = nullptr;
     currentMetric = RouteMetric::EffectiveCost;
     ui->labelTableTitle->setText("No node selected");
     ui->NodeON->setChecked(false);
