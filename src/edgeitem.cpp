@@ -20,6 +20,7 @@ EdgeItem::EdgeItem(Node* a, Node* b, const ChannelProperties& props)
         p.setStyle(Qt::DashDotLine);
     }
     setPen(p);
+    setZValue(-1);
 
     setToolTip(QString("Weight: %1\nType: %2\nMode: %3\nState: %4\nErrProb: %5")
                    .arg(freshProps.weight)
