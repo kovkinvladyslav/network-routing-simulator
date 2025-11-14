@@ -2,16 +2,18 @@
 #include <QBrush>
 #include <QPoint>
 #include <QPen>
+#include <QFont>
 
 Node::Node(int id, QPointF pos)
-    : QGraphicsEllipseItem(-20, -20, 20, 20), id(id)
+    : QGraphicsEllipseItem(-40, -40, 40, 40), id(id)
 {
     setState(NodeState::DISCONNECTED);
     setPos(pos);
     setFlags(ItemIsMovable | ItemIsSelectable | ItemSendsGeometryChanges);
 
     label = new QGraphicsTextItem(QString::number(id), this);
-    label->setDefaultTextColor(Qt::white);
+    label->setDefaultTextColor(Qt::black);
+    label->setFont(QFont("Arial", 16));
 
     QRectF bounds = this->boundingRect();
     label->setPos(bounds.center().x() - label->boundingRect().width()/2,
