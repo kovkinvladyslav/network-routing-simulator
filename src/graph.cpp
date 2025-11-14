@@ -47,7 +47,7 @@ constexpr double SATELLITE_LATENCY = 0.25;
 
 double Graph::computeTransmissionTime(const ChannelProperties &ch, int packetBytes)
 {
-    double transmission = (double)packetBytes * ch.weight * 0.001;
+    double transmission = (double)packetBytes * edgeCost(ch, RouteMetric::EffectiveCost) * 0.001;
 
     double propagation = ch.mode == ChannelMode::Satellite ?
                             SATELLITE_LATENCY:

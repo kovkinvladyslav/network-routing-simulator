@@ -94,9 +94,17 @@
     <addaction name="actionLSR_Run"/>
     <addaction name="actionLSR_Reset_2"/>
    </widget>
+   <widget class="QMenu" name="menuMessage">
+    <property name="title">
+     <string>Message</string>
+    </property>
+    <addaction name="actionSend_Message"/>
+    <addaction name="actionView_Logs"/>
+   </widget>
    <addaction name="menuNode"/>
    <addaction name="menuRouting"/>
    <addaction name="menuStart"/>
+   <addaction name="menuMessage"/>
   </widget>
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
@@ -311,6 +319,11 @@
   <action name="actionSend_Message">
    <property name="text">
     <string>Send Message</string>
+   </property>
+  </action>
+  <action name="actionView_Logs">
+   <property name="text">
+    <string>View Logs</string>
    </property>
   </action>
  </widget>

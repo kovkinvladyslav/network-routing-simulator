@@ -11,7 +11,7 @@
 #include <math.h>
 #include "messagesimulator.h"
 #include "sendmessage.h"
-
+#include "messagestatsdialog.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -271,29 +271,24 @@ void MainWindow::on_actionGenerate_topology_triggered()
     constexpr int SATELLITE_CHANNELS = 2;
     const int TARGET_EDGES = (NODE_COUNT * AVERAGE_DEGREE) / 2;
 
-    // 🔁 1. full reset
     if (stepper) { delete stepper; stepper = nullptr; }
     if (edgeController) { delete edgeController; edgeController = nullptr; }
     if (graph) { delete graph; graph = nullptr; }
     if (selector) { delete selector; selector = nullptr; }
 
-    // 2. create new scene
     QGraphicsScene* scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
     scene->setSceneRect(0, 0, 800, 600);
 
-    // 3. recreate graph, selector, and edge controller
     graph = new Graph(scene);
     selector = new NodeSelector(scene);
     edgeController = new EdgeController(scene, graph);
 
-    // reconnect all signals
     connect(edgeController, &EdgeController::routingChanged,
             this, &MainWindow::updateRouting);
     connect(selector, &NodeSelector::oneNodeSelected,
             this, &MainWindow::onNodeSelected);
 
-    // 4. create nodes
     std::vector<Node*> nodes;
     nodes.reserve(NODE_COUNT);
 
@@ -307,14 +302,12 @@ void MainWindow::on_actionGenerate_topology_triggered()
         edgeController->watchNode(node);
     }
 
-    // 5. generate edges
     int edgeCount = 0;
     auto randomWeight = []() {
         return Graph::ALLOWED_RANDOM_WEIGHTS[
             rand() % Graph::ALLOWED_RANDOM_WEIGHTS.size()];
     };
 
-    // ensure connected ring
     for (int i = 1; i < NODE_COUNT; ++i) {
         Node* a = nodes[i];
         Node* b = nodes[i - 1];
@@ -346,10 +339,8 @@ void MainWindow::on_actionGenerate_topology_triggered()
         edgeCount++;
     }
 
-    // 6. layout
     graph->applyForceDirectedLayout();
 
-    // 7. reset routing/LSR states
     graph->invalidateLSR();
     currentNode = nullptr;
     currentMetric = RouteMetric::EffectiveCost;
@@ -361,7 +352,6 @@ void MainWindow::on_actionGenerate_topology_triggered()
     ui->NodeOFF->setEnabled(false);
     ui->tableView->setModel(nullptr);
 
-    // 8. popup info
     double avgDegree = static_cast<double>(2 * edgeCount) / NODE_COUNT;
     QMessageBox::information(this, "Topology generated",
                              QString("Created topology:\n"
@@ -372,7 +362,6 @@ void MainWindow::on_actionGenerate_topology_triggered()
                                  .arg(avgDegree, 0, 'f', 2)
                                  .arg(SATELLITE_CHANNELS));
 }
-
 
 void MainWindow::on_actionArrange_Graph_triggered()
 {
@@ -388,9 +377,8 @@ void MainWindow::on_actionRouting_Next_triggered()
         edgeController->highlightRelaxations(step.relaxedEdges);
         updateRouting();
     } else {
-        QMessageBox::information(this, "SPF", "Algorythm is finished");
+        QMessageBox::information(this, "SPF", "Algorithm is finished");
     }
-
 }
 
 void MainWindow::on_actionRouting_Start_triggered()
@@ -402,7 +390,7 @@ void MainWindow::on_actionRouting_Start_triggered()
     stepper = new DijkstraStepper(graph, routingSource, currentMetric);
 
     edgeController->clearHighlight();
-    QMessageBox::information(this, "SPF", "Djkstra started from selected node.");
+    QMessageBox::information(this, "SPF", "Dijkstra started from selected node.");
 }
 
 void MainWindow::updateTopologyDB(Node* r) {
@@ -433,7 +421,6 @@ void MainWindow::on_actionRouting_Reset_triggered()
     edgeController->clearHighlight();
 }
 
-
 void MainWindow::on_actionLSR_Run_triggered()
 {
     if(!graph->lsrStarted || graph->lsrComplete){
@@ -445,7 +432,6 @@ void MainWindow::on_actionLSR_Run_triggered()
     if (currentNode)
         updateTopologyDB(currentNode);
     updateHighlight();
-
 }
 
 void MainWindow::on_actionLSR_Start_triggered()
@@ -525,12 +511,33 @@ void MainWindow::on_actionSend_Message_triggered()
         edgeController->clearHighlight();
 
     QMessageBox::information(this, "Simulation Result",
-                             QString("Mode: %1\nTotal time: %2 ms\nPackets: %3\nRetransmissions: %4")
+                             QString("Mode: %1\nTotal time: %2 ms\nPackets: %3\nService data: %4 bytes")
                                  .arg(datagram ? "Datagram" : "Virtual Circuit")
                                  .arg(res.totalTime, 0, 'f', 2)
                                  .arg(res.totalPackets)
-                                 .arg(res.retransmissions));
+                                 .arg(res.serviceDataSize));
+
+    MessageLogEntry log;
+    log.srcId = src->getId();
+    log.dstId = dst->getId();
+    log.mode = datagram ? "Datagram" : "Virtual Circuit";
+    log.messageSize = msgSize;
+    log.packetSize = pkt;
+    log.totalPackets = res.totalPackets;
+    log.serviceBytes = res.serviceDataSize;
+    log.totalTime = res.totalTime;
+
+    QStringList nodes;
+    for (Node* n : res.lastPath)
+        nodes << QString::number(n->getId());
+    log.pathString = nodes.join(" -> ");
+
+    messageLog.push_back(log);
 }
 
-
+void MainWindow::on_actionView_Logs_triggered()
+{
+    MessageStatsDialog dlg(messageLog, this);
+    dlg.exec();
+}
 

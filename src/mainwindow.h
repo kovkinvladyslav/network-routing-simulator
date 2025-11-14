@@ -7,6 +7,7 @@
 #include "nodeselector.h"
 #include "edgecontroller.h"
 #include "djkstrastepper.h"
+#include "messagestats.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -52,6 +53,8 @@ private slots:
 
     void on_actionSend_Message_triggered();
 
+    void on_actionView_Logs_triggered();
+
 private:
     Ui::MainWindow *ui;
     Graph* graph;
@@ -69,7 +72,7 @@ private:
     QVector<Node*> selectedNodes() const;
     void updateTopologyDB(Node* r);
     void updateHighlight();
-
+    std::vector<MessageLogEntry> messageLog;
 
 };
 

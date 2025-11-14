@@ -18,7 +18,7 @@ SendMessage::SendMessage(const std::vector<Node*>& nodes, QWidget *parent)
     ui->msgSizeInput->setRange(1, 1000000);
 
     ui->pkgTypeInp->addItems({"Bytes", "KB"});
-    ui->pkgSzieInp->setRange(8, 65535);
+    ui->pkgSzieInp->setRange(24, 65535);
 
     ui->radioButton->setChecked(true);
 
