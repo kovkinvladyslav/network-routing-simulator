@@ -278,10 +278,7 @@ void MainWindow::on_actionGenerate_topology_triggered()
     constexpr int SATELLITE_CHANNELS = 2;
     const int TARGET_EDGES = (NODE_COUNT * AVERAGE_DEGREE) / 2;
 
-    if (stepper) { delete stepper; stepper = nullptr; }
-    if (edgeController) { delete edgeController; edgeController = nullptr; }
-    if (graph) { delete graph; graph = nullptr; }
-    if (selector) { delete selector; selector = nullptr; }
+    ui->actionClear->trigger();
 
     QGraphicsScene* scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
@@ -719,7 +716,7 @@ void MainWindow::on_actionClear_triggered()
 
     messageLog.clear();
 
-    QMessageBox::information(this, "Clear", "Scene cleared.");
+    //QMessageBox::information(this, "Clear", "Scene cleared.");
 }
 
 
