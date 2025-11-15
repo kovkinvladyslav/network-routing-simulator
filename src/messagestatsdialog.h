@@ -16,6 +16,9 @@ public:
                                 QWidget* parent = nullptr);
     ~MessageStatsDialog();
 
+private slots:
+    void on_copyButton_clicked();
+
 private:
     QStandardItemModel* model;
     Ui::MessageStatsDialog *ui;

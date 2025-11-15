@@ -38,3 +38,27 @@ MessageStatsDialog::MessageStatsDialog(
 MessageStatsDialog::~MessageStatsDialog() {
     delete ui;
 }
+#include <QClipboard>
+#include <QApplication>
+
+void MessageStatsDialog::on_copyButton_clicked()
+{
+    QString output;
+
+    for (int col = 0; col < model->columnCount(); ++col) {
+        output += model->headerData(col, Qt::Horizontal).toString();
+        if (col + 1 < model->columnCount()) output += "\t";
+    }
+    output += "\n";
+
+    for (int row = 0; row < model->rowCount(); ++row) {
+        for (int col = 0; col < model->columnCount(); ++col) {
+            output += model->item(row, col)->text();
+            if (col + 1 < model->columnCount()) output += "\t";
+        }
+        output += "\n";
+    }
+
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(output);
+}

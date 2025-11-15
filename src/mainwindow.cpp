@@ -271,7 +271,7 @@ void MainWindow::on_actionDelete_Node_triggered()
     ui->tableView->setModel(nullptr);
 }
 
-void MainWindow::on_actionGenerate_topology_triggered()
+void MainWindow::generate_topology(ChannelType type, bool is_random)
 {
     constexpr int NODE_COUNT = 24;
     constexpr int AVERAGE_DEGREE = 4;
@@ -312,10 +312,16 @@ void MainWindow::on_actionGenerate_topology_triggered()
             rand() % Graph::ALLOWED_RANDOM_WEIGHTS.size()];
     };
 
+    auto chooseType = [&](ChannelType baseType) {
+        if (!is_random) return baseType;
+        return (rand() % 2 == 0) ? ChannelType::Duplex : ChannelType::HalfDuplex;
+    };
+
     for (int i = 1; i < NODE_COUNT; ++i) {
         Node* a = nodes[i];
         Node* b = nodes[i - 1];
-        ChannelProperties props{ randomWeight(), ChannelType::Duplex, ChannelMode::Normal };
+        ChannelType t = chooseType(type);
+        ChannelProperties props{ randomWeight(), t, ChannelMode::Normal };
         graph->connect(a, b, props);
         edgeController->addEdge(a, b, props);
         edgeCount++;
@@ -325,7 +331,8 @@ void MainWindow::on_actionGenerate_topology_triggered()
         Node* a = nodes[rand() % NODE_COUNT];
         Node* b = nodes[rand() % NODE_COUNT];
         if (a == b || edgeController->findEdge(a, b)) continue;
-        ChannelProperties props{ randomWeight(), ChannelType::Duplex, ChannelMode::Normal };
+        ChannelType t = chooseType(type);
+        ChannelProperties props{ randomWeight(), t, ChannelMode::Normal };
         graph->connect(a, b, props);
         edgeController->addEdge(a, b, props);
         edgeCount++;
@@ -336,7 +343,8 @@ void MainWindow::on_actionGenerate_topology_triggered()
         Node* a = nodes[rand() % NODE_COUNT];
         Node* b = nodes[rand() % NODE_COUNT];
         if (a == b || edgeController->findEdge(a, b)) continue;
-        ChannelProperties props{ randomWeight(), ChannelType::Duplex, ChannelMode::Satellite };
+        ChannelType t = chooseType(type);
+        ChannelProperties props{ randomWeight(), t, ChannelMode::Satellite };
         graph->connect(a, b, props);
         edgeController->addEdge(a, b, props);
         sat++;
@@ -463,6 +471,29 @@ void MainWindow::updateDijkstraState(bool isInitial)
     if (!isInitial) {
         edgeController->highlightDijkstraStep(currentStep, stepper);
     }
+}
+
+void MainWindow::logResult(Node* src, Node* dst,
+                           int msgSize, int pktSize,
+                           bool datagram,
+                           const MessageSimulationResult& res)
+{
+    MessageLogEntry log;
+    log.srcId = src->getId();
+    log.dstId = dst->getId();
+    log.mode = datagram ? "Datagram" : "Virtual Circuit";
+    log.messageSize = msgSize;
+    log.packetSize = pktSize;
+    log.totalPackets = res.totalPackets;
+    log.serviceBytes = res.serviceDataSize;
+    log.totalTime = res.totalTime;
+
+    QStringList nodes;
+    for (Node* n : res.lastPath)
+        nodes << QString::number(n->getId());
+    log.pathString = nodes.join(" -> ");
+
+    messageLog.push_back(log);
 }
 
 void MainWindow::on_actionRouting_Start_triggered()
@@ -720,4 +751,80 @@ void MainWindow::on_actionClear_triggered()
 }
 
 
+
+
+void MainWindow::on_actionTest_Same_Pck_different_Msg_Size_triggered()
+{
+    int pkg = 500;
+    auto selected = ui->graphicsView->scene()->selectedItems();
+    Node* a = nullptr;
+    Node* b = nullptr;
+    if (selected.size() == 2) {
+        a = qgraphicsitem_cast<Node*>(selected[0]);
+        b = qgraphicsitem_cast<Node*>(selected[1]);
+    } else {
+        return;
+    }
+
+    for (int i = 1000; i < 10000; i+= 1000) {
+        logResult(a, b, i, pkg, true, MessageSimulator::sendDatagram(graph, a, b, i, pkg));
+        logResult(a, b, i, pkg, false, MessageSimulator::sendVirtualCircuit(graph, a, b, i, pkg));
+    }
+}
+
+
+void MainWindow::on_actionDuplex_triggered()
+{
+    generate_topology(ChannelType::Duplex);
+}
+
+
+void MainWindow::on_actionHalf_Duplex_triggered()
+{
+    generate_topology(ChannelType::HalfDuplex);
+}
+
+
+void MainWindow::on_actionRandom_triggered()
+{
+    generate_topology(ChannelType::Duplex, true);
+}
+
+
+void MainWindow::on_actionTest_dif_Pck_same_Msg_triggered()
+{
+    int msg = 1000;
+    auto selected = ui->graphicsView->scene()->selectedItems();
+    Node* a = nullptr;
+    Node* b = nullptr;
+    if (selected.size() == 2) {
+        a = qgraphicsitem_cast<Node*>(selected[0]);
+        b = qgraphicsitem_cast<Node*>(selected[1]);
+    } else {
+        return;
+    }
+
+    for (int i = 100; i <= 1000; i+= 100) {
+        logResult(a, b, i, i, true, MessageSimulator::sendDatagram(graph, a, b, msg, i));
+        logResult(a, b, i, i, false, MessageSimulator::sendVirtualCircuit(graph, a, b, msg, i));
+    }
+}
+
+
+void MainWindow::on_actionConvert_to_duplex_triggered()
+{
+
+}
+
+
+void MainWindow::on_actionConvert_to_half_duplex_triggered()
+{
+
+}
+
+
+void MainWindow::on_actionConvert_to_random_triggered()
+{
+
+}
 

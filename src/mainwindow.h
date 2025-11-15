@@ -4,6 +4,7 @@
 
 #include <QMainWindow>
 #include "graph.h"
+#include "messagesimulator.h"
 #include "nodeselector.h"
 #include "edgecontroller.h"
 #include "djkstrastepper.h"
@@ -31,9 +32,6 @@ private slots:
     void on_NodeON_toggled(bool checked);
     void on_NodeOFF_toggled(bool checked);
     void updateRouting();
-
-    void on_actionGenerate_topology_triggered();
-
     void on_actionArrange_Graph_triggered();
 
     void on_actionRouting_Next_triggered();
@@ -57,6 +55,14 @@ private slots:
 
     void on_actionClear_triggered();
 
+    void on_actionTest_Same_Pck_different_Msg_Size_triggered();
+
+    void on_actionDuplex_triggered();
+
+    void on_actionHalf_Duplex_triggered();
+
+    void on_actionRandom_triggered();
+
 private:
     Ui::MainWindow *ui;
     Graph* graph;
@@ -78,6 +84,9 @@ private:
     void updateDijkstraState(bool isInitial);
     DijkstraStep currentStep;
     void on_actionRouting_AutoRun_triggered();
+    void logResult(Node* src, Node* dst,
+                               int msgSize, int pktSize, bool datagram, const MessageSimulationResult& res);
+    void generate_topology(ChannelType type = ChannelType::Duplex, bool is_random = false);
 };
 
 #endif // MAINWINDOW_H

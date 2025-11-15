@@ -42,7 +42,7 @@ MessageSimulationResult MessageSimulator::sendVirtualCircuit(
 {
     MessageSimulationResult result{};
 
-    auto path = graph->getShortestPath(src, dst, RouteMetric::EffectiveCost);
+    auto path = graph->getShortestPath(src, dst, RouteMetric::VirtualCost);
     if (path.size() < 2) {
         result.delivered = false;
         return result;
@@ -66,6 +66,7 @@ MessageSimulationResult MessageSimulator::sendVirtualCircuit(
 
         result.totalTime += sendAck(graph, dst, src, virtual_header_size);
         result.serviceDataSize += virtual_header_size;
+        result.totalPackets += 1;
     }
 
     if (trailBytes > 0) {
@@ -75,6 +76,7 @@ MessageSimulationResult MessageSimulator::sendVirtualCircuit(
 
         result.totalTime += sendAck(graph, dst, src, virtual_header_size);
         result.serviceDataSize += virtual_header_size;
+        result.totalPackets += 1;
     }
 
     result.totalTime += sendBytes(graph, src, dst, virtual_header_size);
