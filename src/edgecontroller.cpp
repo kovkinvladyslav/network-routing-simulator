@@ -104,7 +104,7 @@ void EdgeController::highlightSourceNode(Node* source)
     if (!source) return;
 
     source->highlight(true);
-    source->setBrush(QBrush(QColor(0, 200, 0)));  // Bright green
+    source->setBrush(QBrush(QColor(0, 200, 0)));
 }
 
 void EdgeController::highlightDijkstraStep(const DijkstraStep& step, DijkstraStepper* stepper)

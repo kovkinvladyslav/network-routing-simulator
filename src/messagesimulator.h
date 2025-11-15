@@ -33,10 +33,11 @@ public:
         );
 
 private:
-    static double sendBytes(Graph *graph, Node *from, Node *to, int bytes);
+    static double sendBytes(Graph *graph, Node *from, Node *to, int bytes, bool skipDuplex = false);
     static constexpr int datagram_header_size = 8;
     static constexpr int virtual_header_size = 20;
     static constexpr int service_packets = 7;
+    static double sendAck(Graph *graph, Node *from, Node *to, int size);
 };
 
 #endif // MESSAGE_SIMULATOR_H

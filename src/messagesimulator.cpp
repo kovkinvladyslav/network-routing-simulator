@@ -2,46 +2,45 @@
 #include "graph.h"
 #include <cmath>
 
-#include "messagesimulator.h"
-#include "graph.h"
-#include <cmath>
-
 MessageSimulationResult MessageSimulator::sendDatagram(
     Graph* graph, Node* src, Node* dst,
     int messageSizeBytes, int packetSizeBytes)
 {
     MessageSimulationResult result{};
-    result.totalPackets = std::ceil((double)messageSizeBytes / packetSizeBytes);
-    int trail = messageSizeBytes % packetSizeBytes;
-    messageSizeBytes = messageSizeBytes/packetSizeBytes;
-    auto path = graph->getShortestPath(src, dst, RouteMetric::EffectiveCost);
+
+    auto path = graph->getShortestPath(src, dst, RouteMetric::DataGramCost);
     if (path.size() < 2) {
         result.delivered = false;
         return result;
     }
 
-    for (int i = 0; i < result.totalPackets; ++i) {
-        result.totalTime += sendBytes(graph, src, dst, messageSizeBytes + datagram_header_size);
+    int fullPackets = messageSizeBytes / packetSizeBytes;
+    int trailBytes = messageSizeBytes % packetSizeBytes;
+
+    result.totalPackets = fullPackets + (trailBytes > 0 ? 1 : 0);
+
+    for (int i = 0; i < fullPackets; ++i) {
+        result.totalTime += sendBytes(graph, src, dst,
+                                      packetSizeBytes + datagram_header_size);
         result.serviceDataSize += datagram_header_size;
     }
-    if(trail){
-        result.totalTime += sendBytes(graph, src, dst, trail + datagram_header_size);
+
+    if (trailBytes > 0) {
+        result.totalTime += sendBytes(graph, src, dst,
+                                      trailBytes + datagram_header_size);
         result.serviceDataSize += datagram_header_size;
     }
+
     result.delivered = true;
     result.lastPath = path;
     return result;
 }
-
-
-
 
 MessageSimulationResult MessageSimulator::sendVirtualCircuit(
     Graph* graph, Node* src, Node* dst,
     int messageSizeBytes, int packetSizeBytes)
 {
     MessageSimulationResult result{};
-    result.totalPackets = std::ceil((double)messageSizeBytes / packetSizeBytes) + service_packets;
 
     auto path = graph->getShortestPath(src, dst, RouteMetric::EffectiveCost);
     if (path.size() < 2) {
@@ -49,37 +48,69 @@ MessageSimulationResult MessageSimulator::sendVirtualCircuit(
         return result;
     }
 
-    int trail = messageSizeBytes % packetSizeBytes;
-    messageSizeBytes = messageSizeBytes / packetSizeBytes;
-    result.serviceDataSize += virtual_header_size * 7;
+    int fullPackets = messageSizeBytes / packetSizeBytes;
+    int trailBytes = messageSizeBytes % packetSizeBytes;
 
-    for(int i = 0; i < result.totalPackets; i++) {
-        result.totalTime += sendBytes(graph, src, dst, packetSizeBytes + virtual_header_size);
-        result.totalTime += sendBytes(graph, dst, src, virtual_header_size);
+    result.totalPackets = fullPackets + (trailBytes > 0 ? 1 : 0) + service_packets;
+
+    result.totalTime += sendBytes(graph, src, dst, virtual_header_size);
+    result.serviceDataSize += virtual_header_size;
+
+    result.totalTime += sendAck(graph, dst, src, virtual_header_size);
+    result.serviceDataSize += virtual_header_size;
+
+    for (int i = 0; i < fullPackets; ++i) {
+        result.totalTime += sendBytes(graph, src, dst,
+                                      packetSizeBytes + virtual_header_size);
+        result.serviceDataSize += virtual_header_size;
+
+        result.totalTime += sendAck(graph, dst, src, virtual_header_size);
         result.serviceDataSize += virtual_header_size;
     }
-    if(trail){
-        result.totalTime += sendBytes(graph, src, dst, trail + virtual_header_size);
+
+    if (trailBytes > 0) {
+        result.totalTime += sendBytes(graph, src, dst,
+                                      trailBytes + virtual_header_size);
+        result.serviceDataSize += virtual_header_size;
+
+        result.totalTime += sendAck(graph, dst, src, virtual_header_size);
         result.serviceDataSize += virtual_header_size;
     }
+
+    result.totalTime += sendBytes(graph, src, dst, virtual_header_size);
+    result.serviceDataSize += virtual_header_size;
+
+    result.totalTime += sendAck(graph, dst, src, virtual_header_size);
+    result.serviceDataSize += virtual_header_size;
 
     result.delivered = true;
     result.lastPath = path;
     return result;
 }
 
-double MessageSimulator::sendBytes(Graph *graph, Node *from, Node *to, int bytes)
+double MessageSimulator::sendAck(Graph *graph, Node *from, Node *to, int size)
 {
-    auto path = graph->getShortestPath(from, to, RouteMetric::EffectiveCost);
+    return sendBytes(graph, from, to, size, true);
+}
+
+double MessageSimulator::sendBytes(Graph *graph, Node *from, Node *to, int bytes, bool skipDuplex)
+{
+    auto path = graph->getShortestPath(from, to, RouteMetric::VirtualCost);
     if (path.size() < 2)
         return 0.0;
 
     double totalTime = 0.0;
+
     for (size_t i = 0; i + 1 < path.size(); ++i) {
         Node* a = path[i];
         Node* b = path[i + 1];
         const auto& props = a->get_adj().at(b);
+
+        if (skipDuplex && props.type == ChannelType::Duplex) {
+            continue;
+        }
         totalTime += graph->computeTransmissionTime(props, bytes);
     }
+
     return totalTime;
 }

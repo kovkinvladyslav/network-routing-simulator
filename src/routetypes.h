@@ -6,6 +6,8 @@ class Node;
 
 enum class RouteMetric {
     EffectiveCost,
+    DataGramCost,
+    VirtualCost,
     MinHops
 };
 

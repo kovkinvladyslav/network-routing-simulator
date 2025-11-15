@@ -55,9 +55,6 @@ double Graph::computeTransmissionTime(const ChannelProperties &ch, int packetByt
 
     double t = transmission + propagation;
 
-    if (ch.type == ChannelType::HalfDuplex)
-        t *= 2.0;
-
     return t;
 }
 
@@ -212,11 +209,15 @@ void Graph::removeNode(Node* node)
 
 
 double Graph::edgeCost(const ChannelProperties& p, RouteMetric metric) const {
-    if (metric == RouteMetric::MinHops)
-        return 1.0;
-    int ref_bw = 1000;
-
-    return ref_bw / p.weight + (p.mode == ChannelMode::Satellite ? 250 : 0);
+    double base_cost = 1.0;
+    if (metric != RouteMetric::MinHops) {
+        int ref_bw = 1000;
+        base_cost = ref_bw / p.weight;
+        if (metric == RouteMetric::VirtualCost && p.type == ChannelType::Duplex) {
+            base_cost *= 2;
+        }
+    }
+    return base_cost + (p.mode == ChannelMode::Satellite ? 250 : 0);
 }
 
 RouteTable Graph::computeRoutingFrom(Node* src, RouteMetric metric)
