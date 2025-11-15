@@ -54,16 +54,6 @@ void EdgeController::updateEdges()
 
 }
 
-void EdgeController::clearHighlight()
-{
-    for (auto &e : edges) {
-        QPen p = e->pen();
-        p.setWidth(2);
-        p.setColor(Qt::white);
-        e->setPen(p);
-    }
-}
-
 void EdgeController::highlightPath(const std::vector<Node*>& path)
 {
     clearHighlight();
@@ -103,6 +93,121 @@ void EdgeController::highlightKnownFor(Node *r)
             p.setWidth(4);
             p.setColor(Qt::yellow);
             e->setPen(p);
+        }
+    }
+}
+
+
+void EdgeController::highlightSourceNode(Node* source)
+{
+    clearHighlight();
+    if (!source) return;
+
+    source->highlight(true);
+    source->setBrush(QBrush(QColor(0, 200, 0)));  // Bright green
+}
+
+void EdgeController::highlightDijkstraStep(const DijkstraStep& step, DijkstraStepper* stepper)
+{
+    clearHighlight();
+
+    Node* source = stepper->getSource();
+    const auto& parents = stepper->getParents();
+    const auto& queue = stepper->getQueue();
+
+    source->setBrush(QBrush(QColor(0, 200, 0)));
+
+    if (step.settled) {
+        step.settled->setBrush(QBrush(QColor(255, 165, 0)));
+    }
+
+    if (step.nextToSettle && step.nextToSettle != step.settled) {
+        step.nextToSettle->setBrush(QBrush(QColor(255, 255, 0)));
+    }
+
+    for (auto& [node, parent] : parents) {
+        if (parent && node != source) {
+            bool isSettled = std::find(queue.begin(), queue.end(), node) == queue.end();
+
+            if (auto e = findEdge(node, parent)) {
+                QPen p = e->pen();
+                p.setWidth(3);
+                p.setColor(isSettled ? QColor(0, 255, 0) : QColor(100, 255, 100));
+                e->setPen(p);
+            }
+        }
+    }
+
+    for (auto& [u, v] : step.relaxedEdges) {
+        if (auto e = findEdge(u, v)) {
+            QPen p = e->pen();
+            p.setWidth(5);
+            p.setColor(QColor(0, 255, 255));
+            e->setPen(p);
+        }
+    }
+
+    for (auto& [node, parent] : parents) {
+        bool isSettled = std::find(queue.begin(), queue.end(), node) == queue.end();
+        if (isSettled && node != source && node != step.settled) {
+            node->setBrush(QBrush(QColor(100, 150, 255)));
+        }
+    }
+
+    for (Node* node : queue) {
+        if (node != step.nextToSettle) {
+        }
+    }
+}
+
+void EdgeController::highlightFinalTree(DijkstraStepper* stepper)
+{
+    clearHighlight();
+
+    Node* source = stepper->getSource();
+    const auto& parents = stepper->getParents();
+
+    source->setBrush(QBrush(QColor(0, 200, 0)));
+
+    for (auto& [node, parent] : parents) {
+        if (parent && node != source) {
+            if (auto e = findEdge(node, parent)) {
+                QPen p = e->pen();
+                p.setWidth(4);
+                p.setColor(QColor(0, 255, 0));
+                e->setPen(p);
+            }
+        }
+    }
+
+    for (auto& [node, parent] : parents) {
+        if (node != source) {
+            node->setBrush(QBrush(QColor(100, 200, 255)));
+        }
+    }
+}
+
+void EdgeController::clearHighlight()
+{
+    for (auto &e : edges) {
+        QPen p = e->pen();
+        p.setWidth(2);
+        p.setColor(Qt::white);
+        e->setPen(p);
+    }
+
+    for (auto& node : graph->getAllNodes()) {
+        node->highlight(false);
+        switch(node->getState()) {
+        case NodeState::ON:
+            node->setBrush(Qt::green);
+            break;
+        case NodeState::OFF:
+            node->setBrush(Qt::red);
+            break;
+        case NodeState::DISCONNECTED:
+            node->setBrush(Qt::gray);
+            break;
         }
     }
 }

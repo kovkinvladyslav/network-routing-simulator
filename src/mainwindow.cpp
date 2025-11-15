@@ -202,7 +202,14 @@ void MainWindow::updateRouting()
 {
     if (!currentNode) return;
 
-    ui->labelTableTitle->setText("Routing Table (SPF Result)");
+    // If Dijkstra is running, show its state instead
+    if (stepper && !stepper->finished()) {
+        updateDijkstraState(false);
+        return;
+    }
+
+    ui->labelTableTitle->setText(QString("Final Routing Table (Node %1)")
+                                     .arg(currentNode->getId()));
 
     auto table = graph->computeRoutingFrom(currentNode, currentMetric);
 
@@ -370,27 +377,123 @@ void MainWindow::on_actionArrange_Graph_triggered()
 
 void MainWindow::on_actionRouting_Next_triggered()
 {
-    if (!stepper || stepper->finished()) return;
+    if (!stepper) {
+        QMessageBox::information(this, "SPF", "Start routing first.");
+        return;
+    }
 
-    DijkstraStep step;
-    if (stepper->step(step)) {
-        edgeController->highlightRelaxations(step.relaxedEdges);
-        updateRouting();
+    if (stepper->finished()) {
+        QMessageBox::information(this, "SPF", "Algorithm is complete.");
+        return;
+    }
+
+    if (stepper->step(currentStep)) {
+        updateDijkstraState(false);
     } else {
-        QMessageBox::information(this, "SPF", "Algorithm is finished");
+        QMessageBox::information(this, "SPF", "Algorithm finished!");
+        edgeController->clearHighlight();
+        edgeController->highlightFinalTree(stepper);
+    }
+}
+
+void MainWindow::updateDijkstraState(bool isInitial)
+{
+    if (!stepper || !currentNode) return;
+
+    ui->labelTableTitle->setText(QString("Dijkstra Algorithm - Step by Step (Source: Node %1)")
+                                     .arg(routingSource->getId()));
+
+    const auto& distances = stepper->getDistances();
+    const auto& parents = stepper->getParents();
+    const auto& queue = stepper->getQueue();
+
+        QStandardItemModel* m = new QStandardItemModel(distances.size(), 5, this);
+    m->setHorizontalHeaderLabels({"Node", "Distance", "Previous", "Status", "Next Hop"});
+
+    std::vector<Node*> allNodes = graph->getAllNodes();
+    std::sort(allNodes.begin(), allNodes.end(),
+              [](Node* a, Node* b) { return a->getId() < b->getId(); });
+
+    int row = 0;
+    for (Node* node : allNodes) {
+        m->setItem(row, 0, new QStandardItem(QString::number(node->getId())));
+
+        double dist = distances.at(node);
+        QString distStr = (dist >= 1e17) ? "∞" : QString::number(dist, 'f', 2);
+        m->setItem(row, 1, new QStandardItem(distStr));
+
+        QString prevStr = "-";
+        if (parents.count(node) && parents.at(node)) {
+            prevStr = QString::number(parents.at(node)->getId());
+        }
+        m->setItem(row, 2, new QStandardItem(prevStr));
+
+
+        QString status;
+        if (node == routingSource) {
+            status = "SOURCE";
+        } else if (!isInitial && currentStep.settled == node) {
+            status = "SETTLED NOW";
+        } else if (std::find(queue.begin(), queue.end(), node) == queue.end()) {
+            status = "Settled";
+        } else if (!isInitial && currentStep.nextToSettle == node) {
+            status = "NEXT";
+        } else {
+            status = "Unvisited";
+        }
+        m->setItem(row, 3, new QStandardItem(status));
+
+
+        QString nextHop = "-";
+        if (node != routingSource && parents.count(node) && parents.at(node)) {
+            Node* cur = node;
+            while (parents.count(cur) && parents.at(cur) != routingSource && parents.at(cur) != nullptr) {
+                cur = parents.at(cur);
+            }
+            if (parents.count(node) && parents.at(node) == routingSource) {
+                nextHop = QString::number(node->getId());
+            } else {
+                nextHop = QString::number(cur->getId());
+            }
+        }
+        m->setItem(row, 4, new QStandardItem(nextHop));
+
+        row++;
+    }
+
+    ui->tableView->setModel(m);
+
+    if (!isInitial) {
+        edgeController->highlightDijkstraStep(currentStep, stepper);
     }
 }
 
 void MainWindow::on_actionRouting_Start_triggered()
 {
-    if (!currentNode) return;
+    if (!currentNode) {
+        QMessageBox::information(this, "SPF", "Please select a node first.");
+        return;
+    }
 
     routingSource = currentNode;
     currentMetric = RouteMetric::EffectiveCost;
+
+    if (stepper) {
+        delete stepper;
+    }
+
     stepper = new DijkstraStepper(graph, routingSource, currentMetric);
 
     edgeController->clearHighlight();
-    QMessageBox::information(this, "SPF", "Dijkstra started from selected node.");
+
+    edgeController->highlightSourceNode(routingSource);
+
+    updateDijkstraState(true);
+
+    QMessageBox::information(this, "SPF",
+                             QString("Dijkstra started from node %1.\n"
+                                     "Click 'Routing -> Next Step' to proceed step by step.")
+                                 .arg(routingSource->getId()));
 }
 
 void MainWindow::updateTopologyDB(Node* r) {
@@ -418,7 +521,18 @@ void MainWindow::updateTopologyDB(Node* r) {
 
 void MainWindow::on_actionRouting_Reset_triggered()
 {
+    if (stepper) {
+        delete stepper;
+        stepper = nullptr;
+    }
     edgeController->clearHighlight();
+
+    if (currentNode) {
+        updateRouting();
+    } else {
+        ui->labelTableTitle->setText("No node selected");
+        ui->tableView->setModel(nullptr);
+    }
 }
 
 void MainWindow::on_actionLSR_Run_triggered()

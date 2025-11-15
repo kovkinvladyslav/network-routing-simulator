@@ -87,9 +87,9 @@
     <property name="title">
      <string>Routing</string>
     </property>
-    <addaction name="actionStart_SPF"/>
-    <addaction name="actionRouting_Next"/>
     <addaction name="actionRouting_Start"/>
+    <addaction name="actionRouting_Next"/>
+    <addaction name="actionRouting_AutoRun"/>
     <addaction name="actionRouting_Reset"/>
    </widget>
    <widget class="QMenu" name="menuStart">
@@ -273,7 +273,7 @@
     <string>Arrange Graph</string>
    </property>
   </action>
-  <action name="actionStart_SPF">
+  <action name="actionRouting_Start">
    <property name="text">
     <string>Start SPF</string>
    </property>
@@ -283,7 +283,7 @@
     <string>Next Step</string>
    </property>
   </action>
-  <action name="actionRouting_Start">
+  <action name="actionRouting_AutoRun">
    <property name="text">
     <string>Auto Run</string>
    </property>

@@ -12,6 +12,8 @@ struct DijkstraStep {
     Node* settled = nullptr;
     std::vector<std::pair<Node*,Node*>> relaxedEdges;
     RouteTable current;
+    std::vector<Node*> unvisited;
+    Node* nextToSettle = nullptr;
 };
 
 class DijkstraStepper {
@@ -20,6 +22,11 @@ public:
     bool step(DijkstraStep& out);
     bool finished() const;
     std::vector<Node*> getPathTo(Node *dst);
+
+    const std::unordered_map<Node*, double>& getDistances() const { return dist; }
+    const std::unordered_map<Node*, Node*>& getParents() const { return parent; }
+    const std::vector<Node*>& getQueue() const { return queue; }
+    Node* getSource() const { return source; }
 
 private:
     Graph* graph;

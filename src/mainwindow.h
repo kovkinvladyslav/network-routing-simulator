@@ -75,7 +75,9 @@ private:
     void updateTopologyDB(Node* r);
     void updateHighlight();
     std::vector<MessageLogEntry> messageLog;
-
+    void updateDijkstraState(bool isInitial);
+    DijkstraStep currentStep;
+    void on_actionRouting_AutoRun_triggered();
 };
 
 #endif // MAINWINDOW_H

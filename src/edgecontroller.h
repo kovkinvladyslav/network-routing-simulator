@@ -6,6 +6,7 @@
 #include <memory>
 #include "edgeitem.h"
 #include "graph.h"
+#include "djkstrastepper.h"
 
 class QGraphicsScene;
 class Node;
@@ -23,6 +24,9 @@ public:
     void highlightRelaxations(const std::vector<std::pair<Node*,Node*>>& relaxEdges);
     void highlightKnownFor(Node *r);
     void clearHighlight();
+    void highlightSourceNode(Node* source);
+    void highlightDijkstraStep(const DijkstraStep& step, DijkstraStepper* stepper);
+    void highlightFinalTree(DijkstraStepper* stepper);
 
 signals:
     void routingChanged();

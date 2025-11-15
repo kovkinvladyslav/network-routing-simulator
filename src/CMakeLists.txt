@@ -32,7 +32,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         edgeitem.h edgeitem.cpp
         edgecontroller.h edgecontroller.cpp
         removechanneldialog.h removechanneldialog.cpp removechanneldialog.ui
-        GraphSpringLayout.h
+
         ChannelProperties.h
         routetypes.h
         djkstrastepper.h djkstrastepper.cpp
