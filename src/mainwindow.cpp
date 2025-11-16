@@ -644,8 +644,8 @@ void MainWindow::on_actionSend_Message_triggered()
     bool datagram = dlg.isDatagramMode();
 
     MessageSimulationResult res = datagram
-                                      ? MessageSimulator::sendDatagram(graph, src, dst, msgSize, pkt)
-                                      : MessageSimulator::sendVirtualCircuit(graph, src, dst, msgSize, pkt);
+                                      ? MessageSimulator::sendMessageDatagram(graph, src, dst, msgSize, pkt)
+                                      : MessageSimulator::sendMessageVirtual(graph, src, dst, msgSize, pkt);
 
     if (res.lastPath.size() >= 2)
         edgeController->highlightPath(res.lastPath);
@@ -755,6 +755,7 @@ void MainWindow::on_actionClear_triggered()
 
 void MainWindow::on_actionTest_Same_Pck_different_Msg_Size_triggered()
 {
+    messageLog.clear();
     int pkg = 500;
     auto selected = ui->graphicsView->scene()->selectedItems();
     Node* a = nullptr;
@@ -766,9 +767,9 @@ void MainWindow::on_actionTest_Same_Pck_different_Msg_Size_triggered()
         return;
     }
 
-    for (int i = 1000; i < 10000; i+= 1000) {
-        logResult(a, b, i, pkg, true, MessageSimulator::sendDatagram(graph, a, b, i, pkg));
-        logResult(a, b, i, pkg, false, MessageSimulator::sendVirtualCircuit(graph, a, b, i, pkg));
+    for (int i = 1000; i <= 10000; i+= 1000) {
+        logResult(a, b, i, pkg, true, MessageSimulator::sendMessageDatagram(graph, a, b, i, pkg));
+        logResult(a, b, i, pkg, false, MessageSimulator::sendMessageVirtual(graph, a, b, i, pkg));
     }
 }
 
@@ -793,6 +794,8 @@ void MainWindow::on_actionRandom_triggered()
 
 void MainWindow::on_actionTest_dif_Pck_same_Msg_triggered()
 {
+    messageLog.clear();
+
     int msg = 1000;
     auto selected = ui->graphicsView->scene()->selectedItems();
     Node* a = nullptr;
@@ -805,26 +808,34 @@ void MainWindow::on_actionTest_dif_Pck_same_Msg_triggered()
     }
 
     for (int i = 100; i <= 1000; i+= 100) {
-        logResult(a, b, i, i, true, MessageSimulator::sendDatagram(graph, a, b, msg, i));
-        logResult(a, b, i, i, false, MessageSimulator::sendVirtualCircuit(graph, a, b, msg, i));
+        logResult(a, b, i, i, true, MessageSimulator::sendMessageDatagram(graph, a, b, msg, i));
+        logResult(a, b, i, i, false, MessageSimulator::sendMessageVirtual(graph, a, b, msg, i));
     }
 }
 
 
 void MainWindow::on_actionConvert_to_duplex_triggered()
 {
+    if (!graph) return;
+    graph->setAllChannelsType(ChannelType::Duplex);
+    updateRouting();
 
 }
 
 
 void MainWindow::on_actionConvert_to_half_duplex_triggered()
 {
-
+    if (!graph) return;
+    graph->setAllChannelsType(ChannelType::HalfDuplex);
+    updateRouting();
 }
 
 
 void MainWindow::on_actionConvert_to_random_triggered()
 {
+    if (!graph) return;
+    graph->randomizeChannelTypes();
+    updateRouting();
 
 }
 

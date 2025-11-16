@@ -32,6 +32,8 @@ public:
     bool lsrStarted = false;
     bool lsrComplete = false;
     std::vector<Node*> getShortestPath(Node* src, Node* dst, RouteMetric metric);
+    void setAllChannelsType(ChannelType type);
+    void randomizeChannelTypes();
 
 private:
     void forEachActiveLink(std::function<void(Node*, Node*, const ChannelProperties&)> fn);

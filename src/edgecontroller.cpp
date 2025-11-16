@@ -187,6 +187,16 @@ void EdgeController::highlightFinalTree(DijkstraStepper* stepper)
     }
 }
 
+void EdgeController::refreshAllEdges()
+{
+    for (auto& e : edges) {
+        EdgeItem* edge = e.get();
+        const auto& props = edge->a->get_adj().at(edge->b);
+        edge->updateStyle(props);
+    }
+}
+
+
 void EdgeController::clearHighlight()
 {
     for (auto &e : edges) {

@@ -17,6 +17,7 @@ public:
 
 
     void updatePosition();
+    void updateStyle(const ChannelProperties& props);
 signals:
     void requestRemove(EdgeItem* edge);
     void channelStateChanged();

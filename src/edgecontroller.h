@@ -27,6 +27,7 @@ public:
     void highlightSourceNode(Node* source);
     void highlightDijkstraStep(const DijkstraStep& step, DijkstraStepper* stepper);
     void highlightFinalTree(DijkstraStepper* stepper);
+    void refreshAllEdges();
 
 signals:
     void routingChanged();

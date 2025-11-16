@@ -16,7 +16,7 @@ struct MessageSimulationResult {
 
 class MessageSimulator {
 public:
-    static MessageSimulationResult sendDatagram(
+    static MessageSimulationResult sendMessageDatagram(
         Graph* graph,
         Node* src,
         Node* dst,
@@ -24,20 +24,23 @@ public:
         int packetSizeBytes
         );
 
-    static MessageSimulationResult sendVirtualCircuit(
+    static MessageSimulationResult sendMessageVirtual(
         Graph* graph,
         Node* src,
         Node* dst,
         int messageSizeBytes,
         int packetSizeBytes
         );
-
 private:
-    static double sendBytes(Graph *graph, Node *from, Node *to, int bytes, bool skipDuplex = false);
+    static double sendBytes(Graph *graph, std::vector<Node*> path, int bytes, bool skipDuplex = false);
     static constexpr int datagram_header_size = 8;
     static constexpr int virtual_header_size = 20;
     static constexpr int service_packets = 4;
-    static double sendAck(Graph *graph, Node *from, Node *to, int size);
+    static double sendAck(Graph *graph, std::vector<Node*> path);
+    static void sendDatagram(double &totalTime, int &serviceBytes,
+                             Graph *graph, Node *from, Node *to, int size);
+    static void sendVirtual(double &totaltime, int &serviceBytes, std::vector<Node*> path,
+                            Graph *graph, int size = 0);
 };
 
 #endif // MESSAGE_SIMULATOR_H

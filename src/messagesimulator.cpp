@@ -1,8 +1,11 @@
 #include "messagesimulator.h"
 #include "graph.h"
 #include <cmath>
+#include <QDebug>
+#include <time.h>
+#include <QDateTime>
 
-MessageSimulationResult MessageSimulator::sendDatagram(
+MessageSimulationResult MessageSimulator::sendMessageDatagram(
     Graph* graph, Node* src, Node* dst,
     int messageSizeBytes, int packetSizeBytes)
 {
@@ -20,15 +23,11 @@ MessageSimulationResult MessageSimulator::sendDatagram(
     result.totalPackets = fullPackets + (trailBytes > 0 ? 1 : 0);
 
     for (int i = 0; i < fullPackets; ++i) {
-        result.totalTime += sendBytes(graph, src, dst,
-                                      packetSizeBytes + datagram_header_size);
-        result.serviceDataSize += datagram_header_size;
+        sendDatagram(result.totalTime, result.serviceDataSize, graph, src, dst, packetSizeBytes);
     }
 
     if (trailBytes > 0) {
-        result.totalTime += sendBytes(graph, src, dst,
-                                      trailBytes + datagram_header_size);
-        result.serviceDataSize += datagram_header_size;
+        sendDatagram(result.totalTime, result.serviceDataSize, graph, src, dst, trailBytes);
     }
 
     result.delivered = true;
@@ -36,14 +35,15 @@ MessageSimulationResult MessageSimulator::sendDatagram(
     return result;
 }
 
-MessageSimulationResult MessageSimulator::sendVirtualCircuit(
+MessageSimulationResult MessageSimulator::sendMessageVirtual(
     Graph* graph, Node* src, Node* dst,
     int messageSizeBytes, int packetSizeBytes)
 {
     MessageSimulationResult result{};
 
-    auto path = graph->getShortestPath(src, dst, RouteMetric::VirtualCost);
-    if (path.size() < 2) {
+    auto pathTo = graph->getShortestPath(src, dst, RouteMetric::VirtualCost);
+    auto pathFrom = graph->getShortestPath(dst, src, RouteMetric::VirtualCost);
+    if (pathTo.size() < 2) {
         result.delivered = false;
         return result;
     }
@@ -51,53 +51,53 @@ MessageSimulationResult MessageSimulator::sendVirtualCircuit(
     int fullPackets = messageSizeBytes / packetSizeBytes;
     int trailBytes = messageSizeBytes % packetSizeBytes;
 
-    result.totalPackets = fullPackets + (trailBytes > 0 ? 1 : 0) + service_packets;
+    result.totalPackets = 2 * (fullPackets + (trailBytes > 0 ? 1 : 0)) + service_packets;
 
-    result.totalTime += sendBytes(graph, src, dst, virtual_header_size);
-    result.serviceDataSize += virtual_header_size;
-
-    result.totalTime += sendAck(graph, dst, src, virtual_header_size);
-    result.serviceDataSize += virtual_header_size;
+    sendVirtual(result.totalTime, result.serviceDataSize, pathTo, graph);
+    sendVirtual(result.totalTime, result.serviceDataSize, pathFrom, graph);
 
     for (int i = 0; i < fullPackets; ++i) {
-        result.totalTime += sendBytes(graph, src, dst,
-                                      packetSizeBytes + virtual_header_size);
-        result.serviceDataSize += virtual_header_size;
-
-        result.totalTime += sendAck(graph, dst, src, virtual_header_size);
-        result.serviceDataSize += virtual_header_size;
-        result.totalPackets += 1;
+        sendVirtual(result.totalTime, result.serviceDataSize, pathTo, graph, packetSizeBytes);
+        result.totalTime += sendAck(graph, pathFrom);
     }
 
     if (trailBytes > 0) {
-        result.totalTime += sendBytes(graph, src, dst,
-                                      trailBytes + virtual_header_size);
-        result.serviceDataSize += virtual_header_size;
-
-        result.totalTime += sendAck(graph, dst, src, virtual_header_size);
-        result.serviceDataSize += virtual_header_size;
-        result.totalPackets += 1;
+        sendVirtual(result.totalTime, result.serviceDataSize, pathTo, graph, trailBytes);
+        result.totalTime += sendAck(graph, pathFrom);
     }
 
-    result.totalTime += sendBytes(graph, src, dst, virtual_header_size);
-    result.serviceDataSize += virtual_header_size;
-
-    result.totalTime += sendAck(graph, dst, src, virtual_header_size);
-    result.serviceDataSize += virtual_header_size;
+    sendVirtual(result.totalTime, result.serviceDataSize, pathTo, graph);
+    sendVirtual(result.totalTime, result.serviceDataSize, pathFrom, graph);
 
     result.delivered = true;
-    result.lastPath = path;
+    result.lastPath = pathTo;
     return result;
 }
 
-double MessageSimulator::sendAck(Graph *graph, Node *from, Node *to, int size)
+double MessageSimulator::sendAck(Graph *graph, std::vector<Node*> path)
 {
-    return sendBytes(graph, from, to, size, true);
+    return sendBytes(graph, path, virtual_header_size, true);
 }
 
-double MessageSimulator::sendBytes(Graph *graph, Node *from, Node *to, int bytes, bool skipDuplex)
+void MessageSimulator::sendDatagram(double &totalTime, int &serviceBytes,
+    Graph *graph, Node *from, Node *to, int size)
 {
-    auto path = graph->getShortestPath(from, to, RouteMetric::VirtualCost);
+    auto path = graph->getShortestPath(from, to, RouteMetric::DataGramCost);
+
+    if (path.size() < 2) return;
+    totalTime += sendBytes(graph, path, size + datagram_header_size);
+    serviceBytes += datagram_header_size;
+}
+
+void MessageSimulator::sendVirtual(double &totaltime, int &serviceBytes, std::vector<Node*> path,
+                                   Graph *graph, int size)
+{
+    totaltime += sendBytes(graph, path, size + virtual_header_size);
+    serviceBytes += virtual_header_size;
+}
+
+double MessageSimulator::sendBytes(Graph *graph, std::vector<Node*> path, int bytes, bool skipDuplex)
+{
     if (path.size() < 2)
         return 0.0;
 
@@ -109,6 +109,7 @@ double MessageSimulator::sendBytes(Graph *graph, Node *from, Node *to, int bytes
         const auto& props = a->get_adj().at(b);
 
         if (skipDuplex && props.type == ChannelType::Duplex) {
+            qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss.zzz");
             continue;
         }
         totalTime += graph->computeTransmissionTime(props, bytes);

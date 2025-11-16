@@ -92,6 +92,15 @@ void Node::updateChannelProperty(Node* neighbor, const ChannelProperties& newPro
     }
 }
 
+void Node::update_adj_type(Node* other, ChannelType newType)
+{
+    auto it = adj_nodes.find(other);
+    if (it != adj_nodes.end()) {
+        it->second.type = newType;
+    }
+}
+
+
 void Node::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     emit clicked(this);

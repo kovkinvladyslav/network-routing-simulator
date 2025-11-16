@@ -209,15 +209,18 @@ void Graph::removeNode(Node* node)
 
 
 double Graph::edgeCost(const ChannelProperties& p, RouteMetric metric) const {
+    if (metric == RouteMetric::MinHops){
+        return 1.0;
+    }
     double base_cost = 1.0;
-    if (metric != RouteMetric::MinHops) {
-        int ref_bw = 1000;
-        base_cost = ref_bw / p.weight;
-        if (metric == RouteMetric::VirtualCost && p.type == ChannelType::Duplex) {
-            base_cost *= 2;
-        }
+
+    int ref_bw = 1000;
+    base_cost = ref_bw / p.weight;
+    if (metric == RouteMetric::VirtualCost && p.type == ChannelType::HalfDuplex) {
+        base_cost *= 2;
     }
     return base_cost + (p.mode == ChannelMode::Satellite ? 250 : 0);
+
 }
 
 RouteTable Graph::computeRoutingFrom(Node* src, RouteMetric metric)
@@ -367,6 +370,39 @@ std::vector<Node *> Graph::getShortestPath(Node *src, Node *dst, RouteMetric met
 
     while(stepper.step(tmp)){}
     return stepper.getPathTo(dst);
+}
+
+void Graph::randomizeChannelTypes()
+{
+    forEachActiveLink([&](Node* a, Node* b, const ChannelProperties& oldProps) {
+        ChannelType t = (rand() % 2 == 0)
+        ? ChannelType::Duplex
+        : ChannelType::HalfDuplex;
+
+        a->update_adj_type(b, t);
+        b->update_adj_type(a, t);
+    });
+
+}
+
+void Graph::setAllChannelsType(ChannelType type)
+{
+    forEachActiveLink([&](Node* a, Node* b, const ChannelProperties& oldProps) {
+        ChannelProperties newProps = oldProps;
+        newProps.type = type;
+
+        a->update_adj_type(b, type);
+        b->update_adj_type(a, type);
+
+        for (auto item : scene->items()) {
+            if (auto e = dynamic_cast<EdgeItem*>(item)) {
+                if ((e->a == a && e->b == b) || (e->a == b && e->b == a)) {
+                    e->updateStyle(newProps);
+                }
+            }
+        }
+    });
+
 }
 
 void Graph::forEachActiveLink(std::function<void (Node *, Node *, const ChannelProperties &)> fn)

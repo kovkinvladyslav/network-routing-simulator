@@ -81,6 +81,14 @@
      <addaction name="actionHalf_Duplex"/>
      <addaction name="actionRandom"/>
     </widget>
+    <widget class="QMenu" name="menuConvert_topology">
+     <property name="title">
+      <string>Convert topology</string>
+     </property>
+     <addaction name="actionConvert_to_duplex"/>
+     <addaction name="actionConvert_to_half_duplex"/>
+     <addaction name="actionConvert_to_random"/>
+    </widget>
     <addaction name="menuAdd"/>
     <addaction name="menuDelete"/>
     <addaction name="actionClear"/>
@@ -90,6 +98,7 @@
     <addaction name="menuGenerate_topology"/>
     <addaction name="actionArrange_Graph"/>
     <addaction name="actionSend_Message"/>
+    <addaction name="menuConvert_topology"/>
    </widget>
    <widget class="QMenu" name="menuRouting">
     <property name="title">
@@ -362,6 +371,21 @@
   <action name="actionRandom">
    <property name="text">
     <string>Random</string>
+   </property>
+  </action>
+  <action name="actionConvert_to_duplex">
+   <property name="text">
+    <string>Convert to duplex</string>
+   </property>
+  </action>
+  <action name="actionConvert_to_half_duplex">
+   <property name="text">
+    <string>Convert to half-duplex</string>
+   </property>
+  </action>
+  <action name="actionConvert_to_random">
+   <property name="text">
+    <string>Convert to random</string>
    </property>
   </action>
  </widget>

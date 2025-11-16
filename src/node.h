@@ -33,6 +33,8 @@ public:
     const NodeState getState() const;
     LSATable topologyTable;
     void updateChannelProperty(Node* neighbor, const ChannelProperties& newProps);
+    void update_adj_type(Node* other, ChannelType newType);
+
 signals:
     void clicked(Node* self);
     void moved();

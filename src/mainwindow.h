@@ -63,6 +63,14 @@ private slots:
 
     void on_actionRandom_triggered();
 
+    void on_actionTest_dif_Pck_same_Msg_triggered();
+
+    void on_actionConvert_to_duplex_triggered();
+
+    void on_actionConvert_to_half_duplex_triggered();
+
+    void on_actionConvert_to_random_triggered();
+
 private:
     Ui::MainWindow *ui;
     Graph* graph;
