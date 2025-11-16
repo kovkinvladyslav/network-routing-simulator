@@ -12,10 +12,6 @@ MessageSimulationResult MessageSimulator::sendMessageDatagram(
     MessageSimulationResult result{};
 
     auto path = graph->getShortestPath(src, dst, RouteMetric::DataGramCost);
-    if (path.size() < 2) {
-        result.delivered = false;
-        return result;
-    }
 
     int fullPackets = messageSizeBytes / packetSizeBytes;
     int trailBytes = messageSizeBytes % packetSizeBytes;
@@ -109,7 +105,6 @@ double MessageSimulator::sendBytes(Graph *graph, std::vector<Node*> path, int by
         const auto& props = a->get_adj().at(b);
 
         if (skipDuplex && props.type == ChannelType::Duplex) {
-            qDebug() << QDateTime::currentDateTime().toString("hh:mm:ss.zzz");
             continue;
         }
         totalTime += graph->computeTransmissionTime(props, bytes);
