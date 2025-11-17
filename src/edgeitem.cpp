@@ -41,6 +41,7 @@ void EdgeItem::updatePosition()
 
 void EdgeItem::updateStyle(const ChannelProperties &props)
 {
+    this->props = props;
     QPen p = pen();
     if (active) {
         p.setColor(Qt::white);

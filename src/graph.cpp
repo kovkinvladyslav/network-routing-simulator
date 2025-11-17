@@ -374,15 +374,15 @@ std::vector<Node *> Graph::getShortestPath(Node *src, Node *dst, RouteMetric met
 
 void Graph::randomizeChannelTypes()
 {
-    ChannelType type = (rand() % 2 == 0)
-    ? ChannelType::Duplex
-    : ChannelType::HalfDuplex;
     forEachActiveLink([&](Node* a, Node* b, const ChannelProperties& oldProps) {
-        ChannelProperties newProps = oldProps;
-        newProps.type = type;
 
-        a->update_adj_type(b, type);
-        b->update_adj_type(a, type);
+        ChannelProperties newProps = oldProps;
+        newProps.type = (rand() % 2 == 0)
+                            ? ChannelType::Duplex
+                            : ChannelType::HalfDuplex;
+
+        a->update_adj_type(b, newProps.type);
+        b->update_adj_type(a, newProps.type);
 
         for (auto item : scene->items()) {
             if (auto e = dynamic_cast<EdgeItem*>(item)) {
