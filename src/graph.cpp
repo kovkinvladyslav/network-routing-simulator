@@ -83,19 +83,15 @@ void Graph::applyForceDirectedLayout()
     const QString appDir = QCoreApplication::applicationDirPath();
 
 #ifdef Q_OS_WIN
-    const QString python = QDir(appDir).filePath("../../src/venv/Scripts/python.exe");
+    const QString layoutExe = QDir(appDir).filePath("layout.exe");
 #else
-    const QString python = QDir(appDir).filePath("../../src/venv/bin/python3");
+    const QString layoutExe = QDir(appDir).filePath("layout");
 #endif
-    const QString script = QDir(appDir).filePath("../../src/layout.py");
 
-    qDebug() << "[layout] checking paths:" << python << script;
-    qDebug() << "[layout] appDir =" << appDir;
-    qDebug() << "[layout] absolute python path =" << QDir(python).absolutePath();
-    qDebug() << "[layout] absolute script path =" << QDir(script).absolutePath();
+    qDebug() << "[layout] checking exe:" << layoutExe;
 
-    if (!QFile::exists(python) || !QFile::exists(script)) {
-        qWarning() << "[layout] python or layout.py missing:" << python << script;
+    if (!QFile::exists(layoutExe)) {
+        qWarning() << "[layout] layout executable missing:" << layoutExe;
         doFallbackRadial();
         return;
     }
@@ -106,8 +102,10 @@ void Graph::applyForceDirectedLayout()
     QJsonArray edgesArr;
     std::unordered_map<Node*, int> index;
     index.reserve(nodes.size());
-    for (int i = 0; i < static_cast<int>(nodes.size()); ++i)
+
+    for (int i = 0; i < static_cast<int>(nodes.size()); ++i) {
         index[nodes[i].get()] = i;
+    }
 
     for (int i = 0; i < static_cast<int>(nodes.size()); ++i) {
         Node* a = nodes[i].get();
@@ -116,6 +114,7 @@ void Graph::applyForceDirectedLayout()
             auto it = index.find(b);
             if (it == index.end()) continue;
             int j = it->second;
+
             if (i < j) {
                 QJsonArray e;
                 e.append(i);
@@ -130,22 +129,21 @@ void Graph::applyForceDirectedLayout()
     QByteArray inputJson = QJsonDocument(root).toJson(QJsonDocument::Compact);
 
     if (edgesArr.isEmpty()) {
-        qWarning() << "[layout] No edges to layout.";
+        qWarning() << "[layout] No edges found for layout.";
         doFallbackRadial();
         return;
     }
 
     QProcess proc;
-    proc.setProgram(python);
-    proc.setArguments({script});
-    proc.setWorkingDirectory(QFileInfo(script).absolutePath());
+    proc.setProgram(layoutExe);
+    proc.setArguments({});
+    proc.setWorkingDirectory(appDir);
 
-    qDebug() << "[layout] launching python:" << python;
-    qDebug() << "[layout] layout.py:" << script;
+    qDebug() << "[layout] launching EXE:" << layoutExe;
 
     proc.start();
     if (!proc.waitForStarted(3000)) {
-        qWarning() << "[layout] Failed to start Python:" << proc.errorString();
+        qWarning() << "[layout] Failed to start process:" << proc.errorString();
         doFallbackRadial();
         return;
     }
@@ -154,7 +152,7 @@ void Graph::applyForceDirectedLayout()
     proc.closeWriteChannel();
 
     if (!proc.waitForFinished(10000)) {
-        qWarning() << "[layout] Python timeout.";
+        qWarning() << "[layout] Layout EXE timeout.";
         proc.kill();
         doFallbackRadial();
         return;
@@ -163,14 +161,15 @@ void Graph::applyForceDirectedLayout()
     QByteArray out = proc.readAllStandardOutput();
     QByteArray err = proc.readAllStandardError();
 
-    if (!err.isEmpty())
+    if (!err.isEmpty()) {
         qWarning() << "[layout][stderr]" << err;
+    }
 
     QJsonParseError perr{};
     QJsonDocument parsed = QJsonDocument::fromJson(out, &perr);
 
     if (perr.error != QJsonParseError::NoError || !parsed.isObject()) {
-        qWarning() << "[layout] Invalid JSON output from layout.py:" << perr.errorString();
+        qWarning() << "[layout] Invalid JSON from layout.exe:" << perr.errorString();
         doFallbackRadial();
         return;
     }
@@ -179,8 +178,10 @@ void Graph::applyForceDirectedLayout()
     for (int i = 0; i < static_cast<int>(nodes.size()); ++i) {
         const QJsonArray arr = pos[QString::number(i)].toArray();
         if (arr.size() < 2) continue;
+
         const double x = arr[0].toDouble() * 600 + 400;
         const double y = arr[1].toDouble() * 600 + 300;
+
         nodes[i]->setPos(x, y);
     }
 

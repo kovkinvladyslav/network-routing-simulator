@@ -89,3 +89,28 @@ install(TARGETS kpsrc
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(kpsrc)
 endif()
+
+
+# Build layout.exe using PyInstaller
+
+set(LAYOUT_SCRIPT "${CMAKE_SOURCE_DIR}/layout.py")
+
+set(VENV_PYTHON "${CMAKE_SOURCE_DIR}/venv/Scripts/python.exe")
+
+set(LAYOUT_EXE "${CMAKE_BINARY_DIR}/layout.exe")
+
+add_custom_command(
+    OUTPUT ${LAYOUT_EXE}
+    COMMAND ${VENV_PYTHON} -m PyInstaller --onefile ${LAYOUT_SCRIPT}
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_BINARY_DIR}/dist/layout.exe" ${LAYOUT_EXE}
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    DEPENDS ${LAYOUT_SCRIPT}
+    COMMENT "Building layout.exe using PyInstaller"
+)
+
+add_custom_target(build_layout ALL
+    DEPENDS ${LAYOUT_EXE}
+)
+
+
