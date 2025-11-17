@@ -808,8 +808,8 @@ void MainWindow::on_actionTest_dif_Pck_same_Msg_triggered()
     }
 
     for (int i = 100; i <= 1000; i+= 100) {
-        logResult(a, b, i, i, true, MessageSimulator::sendMessageDatagram(graph, a, b, msg, i));
-        logResult(a, b, i, i, false, MessageSimulator::sendMessageVirtual(graph, a, b, msg, i));
+        logResult(a, b, msg, i, true, MessageSimulator::sendMessageDatagram(graph, a, b, msg, i));
+        logResult(a, b, msg, i, false, MessageSimulator::sendMessageVirtual(graph, a, b, msg, i));
     }
 }
 
